@@ -2,18 +2,32 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Message, GroundingChunk } from '../types';
 import { getGeminiResponse } from '../services/geminiService';
-import { mockVehicles, mockMaintenance, mockExpenses } from '../data/mockData';
 import { CloseIcon, MapPinIcon, SearchIcon, SendIcon, SparklesIcon } from './icons/Icons';
 
-const FleetAssistant: React.FC = () => {
+interface FleetAssistantProps {
+    contextData: any;
+    contextType: 'fleet' | 'crm' | 'financials' | 'routes';
+}
+
+const FleetAssistant: React.FC<FleetAssistantProps> = ({ contextData, contextType }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
-    { id: '1', sender: 'bot', text: 'Hello! How can I help you manage your fleet today?' }
+    { id: '1', sender: 'bot', text: 'Hello! I am the assistant for Heartfledge Logistics. How can I help you keep things moving today?' }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [location, setLocation] = useState<{latitude: number, longitude: number} | null>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
+  
+  const getPlaceholderText = () => {
+      switch (contextType) {
+          case 'fleet': return 'Ask about your fleet...';
+          case 'crm': return 'Ask about your leads...';
+          case 'financials': return 'Ask about invoices or expenses...';
+          case 'routes': return 'Ask about routes and waypoints...';
+          default: return 'Ask me anything...';
+      }
+  };
 
   const scrollToBottom = () => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -34,7 +48,6 @@ const FleetAssistant: React.FC = () => {
         },
         (error) => {
           console.error("Error getting location: ", error);
-          // Don't block the user, just proceed without location
         }
       );
     }
@@ -63,7 +76,8 @@ const FleetAssistant: React.FC = () => {
       const response = await getGeminiResponse(
         input, 
         chatHistory, 
-        { vehicles: mockVehicles, maintenance: mockMaintenance, expenses: mockExpenses },
+        contextData,
+        contextType,
         location
       );
 
@@ -114,7 +128,7 @@ const FleetAssistant: React.FC = () => {
       <button
         onClick={() => setIsOpen(true)}
         className="fixed bottom-6 right-6 bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 transition transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 z-50"
-        aria-label="Open Fleet Assistant"
+        aria-label="Open AI Assistant"
       >
         <SparklesIcon className="w-8 h-8" />
       </button>
@@ -126,7 +140,7 @@ const FleetAssistant: React.FC = () => {
       <header className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 rounded-t-2xl bg-gray-50 dark:bg-gray-800">
         <div className="flex items-center space-x-2">
           <SparklesIcon className="w-6 h-6 text-blue-500" />
-          <h3 className="text-lg font-bold">Fleet Assistant</h3>
+          <h3 className="text-lg font-bold">AI Assistant</h3>
         </div>
         <button onClick={() => setIsOpen(false)} className="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
           <CloseIcon className="w-5 h-5" />
@@ -169,7 +183,7 @@ const FleetAssistant: React.FC = () => {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-            placeholder="Ask about your fleet..."
+            placeholder={getPlaceholderText()}
             className="flex-1 px-4 py-2 bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
             disabled={isLoading}
           />
