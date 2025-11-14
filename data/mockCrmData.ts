@@ -2,10 +2,13 @@
 
 import { Lead, Opportunity, LeadScoringRule, LeadSource, LeadStatus, CompanySize, Industry, OpportunityStage, Currency, User, LeadActivity, LeadActivityType } from '../types';
 
-export const mockSalesReps: User[] = [
-    { id: 1, first_name: 'Alice', last_name: 'Johnson', email: 'alice@heartfledge.com' },
-    { id: 2, first_name: 'Bob', last_name: 'Williams', email: 'bob@heartfledge.com' },
+export const mockUsers: User[] = [
+    { id: 1, first_name: 'Alice', last_name: 'Johnson', email: 'alice@heartfledge.com', role: 'marketing', is_active: true, email_verified: true, created_at: '2023-01-10T00:00:00Z', updated_at: '2023-01-10T00:00:00Z' },
+    { id: 2, first_name: 'Bob', last_name: 'Williams', email: 'bob@heartfledge.com', role: 'admin', is_active: true, email_verified: true, created_at: '2023-01-10T00:00:00Z', updated_at: '2023-01-10T00:00:00Z' },
 ];
+
+// Re-exporting for legacy compatibility where it might be used
+export const mockSalesReps = mockUsers;
 
 export const mockLeads: Lead[] = [
   {

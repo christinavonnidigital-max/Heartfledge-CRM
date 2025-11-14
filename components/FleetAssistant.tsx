@@ -81,7 +81,6 @@ const FleetAssistant: React.FC<FleetAssistantProps> = ({ contextData, contextTyp
         location
       );
 
-      // FIX: Per Gemini API guidelines, the generated text should be accessed via the `.text` property, not by calling it as a function.
       const botMessageText = response.text;
       const groundingChunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks as GroundingChunk[] || [];
 
@@ -185,7 +184,7 @@ const FleetAssistant: React.FC<FleetAssistantProps> = ({ contextData, contextTyp
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
             placeholder={getPlaceholderText()}
-            className="flex-1 px-4 py-2 bg-gray-100 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500"
+            className="flex-1 px-4 py-2 bg-gray-800 border-gray-600 text-white placeholder:text-gray-400 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500"
             disabled={isLoading}
           />
           <button

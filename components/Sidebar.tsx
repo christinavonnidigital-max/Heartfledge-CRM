@@ -1,6 +1,6 @@
 
 import React, { Fragment } from 'react';
-import { BarChartIcon, BriefcaseIcon, CreditCardIcon, DriverIcon, MapIcon, SettingsIcon, TruckIcon, UsersIcon, GridIcon, DocumentTextIcon, CampaignIcon } from './icons/Icons';
+import { BarChartIcon, BriefcaseIcon, CreditCardIcon, DriverIcon, MapIcon, SettingsIcon, TruckIcon, UsersIcon, GridIcon, DocumentTextIcon, CampaignIcon, ChartPieIcon } from './icons/Icons';
 import { View } from '../App';
 
 interface SidebarProps {
@@ -81,6 +81,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setActiveView, isOpen, se
                         <NavLink view="leads" activeView={activeView} setActiveView={setActiveView} setIsOpen={setIsOpen} icon={<BriefcaseIcon className="w-6 h-6" />} name="Leads / CRM" />
                         <NavLink view="marketing" activeView={activeView} setActiveView={setActiveView} setIsOpen={setIsOpen} icon={<CampaignIcon className="w-6 h-6" />} name="Marketing" />
                         <NavLink view="campaigns" activeView={activeView} setActiveView={setActiveView} setIsOpen={setIsOpen} icon={<CampaignIcon className="w-6 h-6" />} name="Campaigns" />
+                        <NavLink view="analytics" activeView={activeView} setActiveView={setActiveView} setIsOpen={setIsOpen} icon={<ChartPieIcon className="w-6 h-6" />} name="Analytics" />
                      </div>
                 </div>
                  <div className="pt-4 mt-2">
@@ -103,7 +104,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setActiveView, isOpen, se
   return (
     <>
         {/* Mobile Sidebar */}
-        <div className={`fixed inset-0 z-40 md:hidden ${isOpen ? 'block' : 'hidden'}`}>
+        <div className={`fixed inset-0 z-50 md:hidden ${isOpen ? 'block' : 'hidden'}`}>
             {/* Overlay */}
             <div className="absolute inset-0 bg-black opacity-50" onClick={() => setIsOpen(false)}></div>
             <div className={`relative transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
@@ -113,7 +114,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setActiveView, isOpen, se
 
         {/* Desktop Sidebar */}
         <div className="hidden md:flex md:flex-shrink-0">
-             <div className="fixed inset-y-0 left-0 w-64">
+             <div className="fixed inset-y-0 left-0 w-64 z-40">
                 {navContent}
             </div>
         </div>

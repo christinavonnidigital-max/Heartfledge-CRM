@@ -5,7 +5,6 @@ import { mockInvoices, mockAllExpenses } from '../data/mockFinancialsData';
 import InvoiceList from './InvoiceList';
 import ExpenseList from './ExpenseList';
 import { InvoiceStatus } from '../types';
-// FIX: Replaced missing DollarIcon with CurrencyDollarIcon.
 import { CurrencyDollarIcon } from './icons/Icons';
 
 const FinancialsDashboard: React.FC = () => {

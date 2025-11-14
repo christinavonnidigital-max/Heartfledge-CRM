@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import Sidebar from './Sidebar';
 import { MenuIcon, TruckIcon } from './icons/Icons';
-import AiAssistant from './AiAssistant';
+import AiAssistant from './FleetAssistant';
 import { View } from '../App';
 
 interface LayoutProps {
@@ -22,10 +22,11 @@ const viewTitles: { [key in View]: string } = {
     reports: 'Reports & Analytics',
     leads: 'Leads Management',
     campaigns: 'Marketing Campaigns',
+    'new-campaign': 'Create New Campaign',
     financials: 'Financials',
     marketing: 'Marketing Hub',
     settings: 'Settings',
-    analytics: 'Analytics',
+    analytics: 'Campaign Analytics',
 };
 
 

@@ -81,16 +81,10 @@ export const mockRoutes: Route[] = [
 ];
 
 export const mockWaypoints: RouteWaypoint[] = [
-    // FIX: Added 'created_at' property to satisfy RouteWaypoint interface.
     { id: 1, route_id: 1, waypoint_order: 1, location_name: 'Masvingo', location_type: WaypointLocationType.CITY, latitude: -20.0744, longitude: 30.8329, estimated_arrival_hours: 4, is_mandatory_stop: false, created_at: '2024-01-10T00:00:00Z' },
-    // FIX: Added 'created_at' property to satisfy RouteWaypoint interface.
     { id: 2, route_id: 1, waypoint_order: 2, location_name: 'Beitbridge Border Post', location_type: WaypointLocationType.BORDER, latitude: -22.2167, longitude: 29.9833, estimated_arrival_hours: 8, is_mandatory_stop: true, average_stop_duration_minutes: 360, created_at: '2024-01-10T00:00:00Z' },
-    // FIX: Added 'created_at' property to satisfy RouteWaypoint interface.
     { id: 3, route_id: 1, waypoint_order: 3, location_name: 'Polokwane', location_type: WaypointLocationType.CITY, latitude: -23.9045, longitude: 29.4689, estimated_arrival_hours: 14, is_mandatory_stop: false, created_at: '2024-01-10T00:00:00Z' },
-    // FIX: Added 'created_at' property to satisfy RouteWaypoint interface.
     { id: 4, route_id: 2, waypoint_order: 1, location_name: 'Gweru', location_type: WaypointLocationType.CITY, latitude: -19.4539, longitude: 29.8142, estimated_arrival_hours: 3.5, is_mandatory_stop: false, created_at: '2024-01-10T00:00:00Z' },
-    // FIX: Added 'created_at' property to satisfy RouteWaypoint interface.
     { id: 5, route_id: 3, waypoint_order: 1, location_name: 'Mutare', location_type: WaypointLocationType.CITY, latitude: -18.9707, longitude: 32.671, estimated_arrival_hours: 4, is_mandatory_stop: true, average_stop_duration_minutes: 30, created_at: '2024-02-01T00:00:00Z' },
-    // FIX: Added 'created_at' property to satisfy RouteWaypoint interface.
     { id: 6, route_id: 3, waypoint_order: 2, location_name: 'Machipanda Border Post', location_type: WaypointLocationType.BORDER, latitude: -18.9667, longitude: 32.7167, estimated_arrival_hours: 4.5, is_mandatory_stop: true, average_stop_duration_minutes: 180, created_at: '2024-02-01T00:00:00Z' },
 ];

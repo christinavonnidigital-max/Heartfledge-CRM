@@ -138,7 +138,6 @@ export const mockAllExpenses: Expense[] = [
     payment_status: ExpensePaymentStatus.PAID,
     recorded_by: 2,
     is_recurring: true,
-    // FIX: Used RecurringFrequency enum member instead of string literal
     recurring_frequency: RecurringFrequency.MONTHLY,
     created_at: '2024-07-25',
     updated_at: '2024-07-25',

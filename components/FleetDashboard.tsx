@@ -1,15 +1,17 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { mockVehicles } from '../data/mockData';
-import { Vehicle, VehicleStatus } from '../types';
+import { mockVehicles, mockExpenses } from '../data/mockData';
+import { Vehicle, VehicleStatus, VehicleExpense } from '../types';
 import VehicleDetails from './VehicleDetails';
-// FIX: Imported missing CheckCircleIcon.
 import { PlusIcon, SearchIcon, IllustrationTruckIcon, CheckCircleIcon } from './icons/Icons';
 import EmptyState from './EmptyState';
+import AddExpenseModal from './AddExpenseModal';
 
 const FleetDashboard: React.FC = () => {
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(mockVehicles.length > 0 ? mockVehicles[0] : null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [expenses, setExpenses] = useState<VehicleExpense[]>(mockExpenses);
+  const [isAddExpenseModalOpen, setIsAddExpenseModalOpen] = useState(false);
 
   const filteredVehicles = useMemo(() => {
     if (!searchTerm) {
@@ -28,6 +30,19 @@ const FleetDashboard: React.FC = () => {
     }
   }, [searchTerm, selectedVehicle, filteredVehicles]);
 
+  const handleAddExpense = (newExpense: Omit<VehicleExpense, 'id' | 'vehicle_id' | 'created_at' | 'recorded_by'>) => {
+    if (!selectedVehicle) return;
+    const newExpenseWithId: VehicleExpense = {
+        ...newExpense,
+        id: Date.now(),
+        vehicle_id: selectedVehicle.id,
+        recorded_by: 1, // Assuming user ID 1 is recording
+        created_at: new Date().toISOString(),
+    };
+    setExpenses(prev => [...prev, newExpenseWithId]);
+    setIsAddExpenseModalOpen(false);
+  };
+
 
   const getStatusPill = (status: VehicleStatus) => {
     switch (status) {
@@ -41,71 +56,83 @@ const FleetDashboard: React.FC = () => {
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <div className="lg:col-span-1 bg-white rounded-xl shadow-md flex flex-col">
-        <div className="p-4 border-b border-gray-200">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-bold">Vehicle Fleet ({filteredVehicles.length})</h2>
-            <button 
-                className="p-2 rounded-full bg-orange-500 text-white hover:bg-orange-600 transition"
-                onClick={() => alert('Add Vehicle form would open here.')}
-            >
-              <PlusIcon className="w-5 h-5"/>
-            </button>
-          </div>
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="Filter by reg. number or make..."
-              value={searchTerm}
-              onChange={e => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
-            />
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <SearchIcon className="w-5 h-5 text-gray-400" />
+    <>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-1 bg-white rounded-xl shadow-md flex flex-col">
+          <div className="p-4 border-b border-gray-200">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold">Vehicle Fleet ({filteredVehicles.length})</h2>
+              <button 
+                  className="p-2 rounded-full bg-orange-500 text-white hover:bg-orange-600 transition"
+                  onClick={() => alert('Add Vehicle form would open here.')}
+              >
+                <PlusIcon className="w-5 h-5"/>
+              </button>
             </div>
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Filter by reg. number or make..."
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 bg-gray-800 text-white border-gray-600 placeholder:text-gray-400"
+              />
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <SearchIcon className="w-5 h-5 text-gray-400" />
+              </div>
+            </div>
+          </div>
+          <div className="overflow-y-auto">
+            {filteredVehicles.length > 0 ? (
+              <ul className="divide-y divide-gray-200">
+                {filteredVehicles.map((vehicle) => (
+                  <li
+                    key={vehicle.id}
+                    onClick={() => setSelectedVehicle(vehicle)}
+                    className={`p-4 cursor-pointer hover:bg-gray-50 transition ${
+                      selectedVehicle?.id === vehicle.id ? 'bg-orange-50' : ''
+                    }`}
+                  >
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <p className="font-semibold text-gray-900">{vehicle.make} {vehicle.model}</p>
+                        <p className="text-sm text-gray-500">{vehicle.registration_number}</p>
+                      </div>
+                      {getStatusPill(vehicle.status)}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <div className="p-8 text-center text-gray-500">
+                  <p>No vehicles found for "{searchTerm}".</p>
+              </div>
+            )}
           </div>
         </div>
-        <div className="overflow-y-auto">
-          {filteredVehicles.length > 0 ? (
-            <ul className="divide-y divide-gray-200">
-              {filteredVehicles.map((vehicle) => (
-                <li
-                  key={vehicle.id}
-                  onClick={() => setSelectedVehicle(vehicle)}
-                  className={`p-4 cursor-pointer hover:bg-gray-50 transition ${
-                    selectedVehicle?.id === vehicle.id ? 'bg-orange-50' : ''
-                  }`}
-                >
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <p className="font-semibold text-gray-900">{vehicle.make} {vehicle.model}</p>
-                      <p className="text-sm text-gray-500">{vehicle.registration_number}</p>
-                    </div>
-                    {getStatusPill(vehicle.status)}
-                  </div>
-                </li>
-              ))}
-            </ul>
+        <div className="lg:col-span-2 flex flex-col gap-6">
+          {selectedVehicle ? (
+            <VehicleDetails 
+                vehicle={selectedVehicle}
+                expenses={expenses}
+                onAddExpenseClick={() => setIsAddExpenseModalOpen(true)}
+            />
           ) : (
-            <div className="p-8 text-center text-gray-500">
-                <p>No vehicles found for "{searchTerm}".</p>
-            </div>
+             <EmptyState 
+               icon={<IllustrationTruckIcon />}
+               title="Select a Vehicle"
+               message="Choose a vehicle from the list to view its details, maintenance history, and expenses."
+             />
           )}
         </div>
       </div>
-      <div className="lg:col-span-2 flex flex-col gap-6">
-        {selectedVehicle ? (
-          <VehicleDetails vehicle={selectedVehicle} />
-        ) : (
-           <EmptyState 
-             icon={<IllustrationTruckIcon />}
-             title="Select a Vehicle"
-             message="Choose a vehicle from the list to view its details, maintenance history, and expenses."
-           />
-        )}
-      </div>
-    </div>
+      {isAddExpenseModalOpen && selectedVehicle && (
+        <AddExpenseModal
+            onClose={() => setIsAddExpenseModalOpen(false)}
+            onAddExpense={handleAddExpense}
+        />
+      )}
+    </>
   );
 };
 

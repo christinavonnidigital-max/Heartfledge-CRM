@@ -1,5 +1,4 @@
-
-import { Vehicle, VehicleMaintenance, VehicleExpense, VehicleType, VehicleStatus, MaintenanceType, MaintenanceStatus, ExpenseType, Currency } from '../types';
+import { Vehicle, VehicleMaintenance, VehicleExpense, VehicleType, VehicleStatus, MaintenanceType, MaintenanceStatus, ExpenseType, Currency, FuelType } from '../types';
 
 export const mockVehicles: Vehicle[] = [
   {
@@ -11,10 +10,18 @@ export const mockVehicles: Vehicle[] = [
     vehicle_type: VehicleType.DRY,
     capacity_tonnes: 34,
     status: VehicleStatus.ACTIVE,
-    current_km: 150000,
+    purchase_date: '2021-03-15',
+    purchase_cost: 120000,
+    current_value: 95000,
+    insurance_provider: 'Old Mutual',
+    insurance_expiry_date: '2025-03-14',
     last_service_date: '2024-05-10',
     next_service_due_km: 160000,
+    current_km: 150000,
+    fuel_type: FuelType.DIESEL,
     gps_device_id: 'GPS-001A',
+    created_at: '2021-03-15T00:00:00Z',
+    updated_at: '2024-07-20T00:00:00Z',
   },
   {
     id: 2,
@@ -25,10 +32,18 @@ export const mockVehicles: Vehicle[] = [
     vehicle_type: VehicleType.REFRIGERATED,
     capacity_tonnes: 30,
     status: VehicleStatus.ACTIVE,
-    current_km: 85000,
+    purchase_date: '2022-01-20',
+    purchase_cost: 155000,
+    current_value: 130000,
+    insurance_provider: 'NICOZ Diamond',
+    insurance_expiry_date: '2025-01-19',
     last_service_date: '2024-06-01',
     next_service_due_km: 95000,
+    current_km: 85000,
+    fuel_type: FuelType.DIESEL,
     gps_device_id: 'GPS-002B',
+    created_at: '2022-01-20T00:00:00Z',
+    updated_at: '2024-07-22T00:00:00Z',
   },
   {
     id: 3,
@@ -39,10 +54,18 @@ export const mockVehicles: Vehicle[] = [
     vehicle_type: VehicleType.FLATBED,
     capacity_tonnes: 25,
     status: VehicleStatus.MAINTENANCE,
-    current_km: 210000,
+    purchase_date: '2019-08-01',
+    purchase_cost: 85000,
+    current_value: 60000,
+    insurance_provider: 'Old Mutual',
+    insurance_expiry_date: '2024-12-31',
     last_service_date: '2024-04-15',
     next_service_due_km: 220000,
+    current_km: 210000,
+    fuel_type: FuelType.DIESEL,
     gps_device_id: 'GPS-003C',
+    created_at: '2019-08-01T00:00:00Z',
+    updated_at: '2024-07-18T00:00:00Z',
   },
    {
     id: 4,
@@ -53,23 +76,31 @@ export const mockVehicles: Vehicle[] = [
     vehicle_type: VehicleType.DRY,
     capacity_tonnes: 32,
     status: VehicleStatus.ACTIVE,
-    current_km: 180500,
+    purchase_date: '2020-05-25',
+    purchase_cost: 110000,
+    current_value: 85000,
+    insurance_provider: 'FBC Insurance',
+    insurance_expiry_date: '2025-05-24',
     last_service_date: '2024-07-02',
     next_service_due_km: 190000,
+    current_km: 180500,
+    fuel_type: FuelType.DIESEL,
     gps_device_id: 'GPS-004D',
+    created_at: '2020-05-25T00:00:00Z',
+    updated_at: '2024-07-21T00:00:00Z',
   },
 ];
 
 export const mockMaintenance: VehicleMaintenance[] = [
-  { id: 1, vehicle_id: 1, maintenance_type: MaintenanceType.ROUTINE, description: 'Engine oil and filter change', cost: 350, service_date: '2024-05-10', status: MaintenanceStatus.COMPLETED },
-  { id: 2, vehicle_id: 2, maintenance_type: MaintenanceType.ROUTINE, description: 'Brake inspection and fluid top-up', cost: 200, service_date: '2024-06-01', status: MaintenanceStatus.COMPLETED },
-  { id: 3, vehicle_id: 3, maintenance_type: MaintenanceType.REPAIR, description: 'Transmission fluid leak repair', cost: 1200, service_date: '2024-07-20', status: MaintenanceStatus.IN_PROGRESS },
-  { id: 4, vehicle_id: 1, maintenance_type: MaintenanceType.INSPECTION, description: 'Quarterly safety inspection', cost: 150, service_date: '2024-02-15', status: MaintenanceStatus.COMPLETED },
+  { id: 1, vehicle_id: 1, maintenance_type: MaintenanceType.ROUTINE, description: 'Engine oil and filter change', service_provider: 'DAF Service Center', cost: 350, service_date: '2024-05-10', status: MaintenanceStatus.COMPLETED, created_by: 1, created_at: '2024-05-10T00:00:00Z', updated_at: '2024-05-10T00:00:00Z' },
+  { id: 2, vehicle_id: 2, maintenance_type: MaintenanceType.ROUTINE, description: 'Brake inspection and fluid top-up', service_provider: 'ZIMOCO', cost: 200, service_date: '2024-06-01', status: MaintenanceStatus.COMPLETED, created_by: 1, created_at: '2024-06-01T00:00:00Z', updated_at: '2024-06-01T00:00:00Z' },
+  { id: 3, vehicle_id: 3, maintenance_type: MaintenanceType.REPAIR, description: 'Transmission fluid leak repair', service_provider: 'Truck Repairs Inc.', cost: 1200, service_date: '2024-07-20', status: MaintenanceStatus.IN_PROGRESS, created_by: 2, created_at: '2024-07-20T00:00:00Z', updated_at: '2024-07-20T00:00:00Z' },
+  { id: 4, vehicle_id: 1, maintenance_type: MaintenanceType.INSPECTION, description: 'Quarterly safety inspection', service_provider: 'VID', cost: 150, service_date: '2024-02-15', status: MaintenanceStatus.COMPLETED, created_by: 1, created_at: '2024-02-15T00:00:00Z', updated_at: '2024-02-15T00:00:00Z' },
 ];
 
 export const mockExpenses: VehicleExpense[] = [
-  { id: 1, vehicle_id: 1, expense_type: ExpenseType.FUEL, amount: 500, currency: Currency.USD, description: 'Diesel fill-up', expense_date: '2024-07-15' },
-  { id: 2, vehicle_id: 2, expense_type: ExpenseType.FUEL, amount: 450, currency: Currency.USD, description: 'Diesel fill-up', expense_date: '2024-07-16' },
-  { id: 3, vehicle_id: 3, expense_type: ExpenseType.MAINTENANCE, amount: 1200, currency: Currency.USD, description: 'Transmission repair payment', expense_date: '2024-07-20' },
-  { id: 4, vehicle_id: 1, expense_type: ExpenseType.TOLLS, amount: 50, currency: Currency.ZIG, description: 'Highway tolls', expense_date: '2024-07-18' },
+  { id: 1, vehicle_id: 1, expense_type: ExpenseType.FUEL, amount: 500, currency: Currency.USD, description: 'Diesel fill-up', expense_date: '2024-07-15', recorded_by: 1, created_at: '2024-07-15T00:00:00Z' },
+  { id: 2, vehicle_id: 2, expense_type: ExpenseType.FUEL, amount: 450, currency: Currency.USD, description: 'Diesel fill-up', expense_date: '2024-07-16', recorded_by: 1, created_at: '2024-07-16T00:00:00Z' },
+  { id: 3, vehicle_id: 3, expense_type: ExpenseType.MAINTENANCE, amount: 1200, currency: Currency.USD, description: 'Transmission repair payment', expense_date: '2024-07-20', recorded_by: 2, created_at: '2024-07-20T00:00:00Z' },
+  { id: 4, vehicle_id: 1, expense_type: ExpenseType.TOLLS, amount: 50, currency: Currency.ZIG, description: 'Highway tolls', expense_date: '2024-07-18', recorded_by: 1, created_at: '2024-07-18T00:00:00Z' },
 ];

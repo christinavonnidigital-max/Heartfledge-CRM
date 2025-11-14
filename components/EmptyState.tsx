@@ -6,6 +6,7 @@ interface EmptyStateProps {
   message: string;
 }
 
+// FIX: Changed component definition to use React.FC to resolve "Cannot find namespace 'JSX'" error.
 const EmptyState: React.FC<EmptyStateProps> = ({ icon, title, message }) => {
   return (
     <div className="flex items-center justify-center h-full bg-white rounded-xl shadow-md">
@@ -19,4 +20,3 @@ const EmptyState: React.FC<EmptyStateProps> = ({ icon, title, message }) => {
 };
 
 export default EmptyState;
-```

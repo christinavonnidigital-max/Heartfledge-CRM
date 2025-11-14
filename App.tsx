@@ -1,5 +1,7 @@
 
 import React, { useState } from 'react';
+// FIX: Ensured all component and data imports use relative paths (e.g., './') 
+// to resolve module specifier errors.
 import Layout from './components/Layout';
 import FleetDashboard from './components/FleetDashboard';
 import CrmDashboard from './components/CrmDashboard';
@@ -12,6 +14,8 @@ import CustomersPage from './components/CustomersPage';
 import ReportsPage from './components/ReportsPage';
 import MarketingDashboard from './components/MarketingDashboard';
 import CampaignsPage from './components/CampaignsPage';
+import NewCampaignPage from './components/NewCampaignPage';
+import CampaignAnalyticsPage from './components/CampaignAnalyticsPage';
 
 import { mockVehicles, mockMaintenance, mockExpenses } from './data/mockData';
 import { mockLeads, mockOpportunities, mockLeadScoringRules, mockSalesReps, mockLeadActivities } from './data/mockCrmData';
@@ -21,10 +25,10 @@ import { mockBookings } from './data/mockBookingsData';
 import { mockCampaigns, mockSalesSequences } from './data/mockMarketingData';
 
 
-export type View = 'dashboard' | 'fleet' | 'bookings' | 'drivers' | 'customers' | 'routes' | 'reports' | 'leads' | 'campaigns' | 'financials' | 'marketing' | 'settings' | 'analytics';
+export type View = 'dashboard' | 'fleet' | 'bookings' | 'drivers' | 'customers' | 'routes' | 'reports' | 'leads' | 'campaigns' | 'new-campaign' | 'financials' | 'marketing' | 'settings' | 'analytics';
 
 function App() {
-  const [activeView, setActiveView] = useState<View>('dashboard');
+  const [activeView, setActiveView] = useState<View>('leads');
 
   const contextData = {
     dashboard: {
@@ -62,7 +66,7 @@ function App() {
 
   const renderView = () => {
     switch(activeView) {
-      case 'dashboard': return <Dashboard />;
+      case 'dashboard': return <Dashboard data={contextData.dashboard} />;
       case 'fleet': return <FleetDashboard />;
       case 'crm': return <CrmDashboard />;
       case 'financials': return <FinancialsDashboard />;
@@ -72,16 +76,18 @@ function App() {
       case 'customers': return <CustomersPage />;
       case 'reports': return <ReportsPage />;
       case 'leads': return <CrmDashboard />; // leads is main part of CRM
-      case 'campaigns': return <CampaignsPage />;
+      case 'campaigns': return <CampaignsPage setActiveView={setActiveView} />;
+      case 'new-campaign': return <NewCampaignPage setActiveView={setActiveView} />;
       case 'marketing': return <MarketingDashboard />;
-      default: return <Dashboard />;
+      case 'analytics': return <CampaignAnalyticsPage />;
+      default: return <Dashboard data={contextData.dashboard} />;
     }
   }
   
   const getContext = () => {
     if (activeView === 'leads') return contextData.crm;
-    if (['dashboard', 'fleet', 'crm', 'financials', 'routes', 'marketing'].includes(activeView)) {
-        return contextData[activeView as keyof typeof contextData];
+    if (['dashboard', 'fleet', 'crm', 'financials', 'routes', 'marketing', 'new-campaign', 'analytics'].includes(activeView)) {
+        return contextData[activeView as keyof typeof contextData] || contextData.marketing;
     }
     return contextData.dashboard; // Default context
   }

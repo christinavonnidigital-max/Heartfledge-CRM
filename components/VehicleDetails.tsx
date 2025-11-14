@@ -1,11 +1,13 @@
 
-import React from 'react';
-import { Vehicle } from '../types';
-import { mockMaintenance, mockExpenses } from '../data/mockData';
-import { CogIcon, CurrencyDollarIcon, GaugeIcon, RoadIcon, WrenchIcon } from './icons/Icons';
+import React, { useState, useMemo } from 'react';
+import { Vehicle, VehicleExpense } from '../types';
+import { mockMaintenance } from '../data/mockData';
+import { CogIcon, CurrencyDollarIcon, GaugeIcon, PlusIcon, RoadIcon, WrenchIcon } from './icons/Icons';
 
 interface VehicleDetailsProps {
   vehicle: Vehicle;
+  expenses: VehicleExpense[];
+  onAddExpenseClick: () => void;
 }
 
 const StatCard: React.FC<{ icon: React.ReactNode; label: string; value: string | number }> = ({ icon, label, value }) => (
@@ -19,9 +21,54 @@ const StatCard: React.FC<{ icon: React.ReactNode; label: string; value: string |
 );
 
 
-const VehicleDetails: React.FC<VehicleDetailsProps> = ({ vehicle }) => {
+const VehicleDetails: React.FC<VehicleDetailsProps> = ({ vehicle, expenses, onAddExpenseClick }) => {
+  const [filterType, setFilterType] = useState('all');
+  const [customStartDate, setCustomStartDate] = useState('');
+  const [customEndDate, setCustomEndDate] = useState('');
+  
   const maintenanceHistory = mockMaintenance.filter((m) => m.vehicle_id === vehicle.id);
-  const expenseHistory = mockExpenses.filter((e) => e.vehicle_id === vehicle.id);
+  
+  const filteredExpenses = useMemo(() => {
+    const expenseHistory = expenses.filter((e) => e.vehicle_id === vehicle.id);
+
+    if (filterType === 'all') {
+      return expenseHistory;
+    }
+
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+    return expenseHistory.filter(expense => {
+      // Append T00:00:00 to parse date string in local timezone
+      const expenseDate = new Date(expense.expense_date + 'T00:00:00');
+
+      switch (filterType) {
+        case '7days': {
+          const sevenDaysAgo = new Date(today);
+          sevenDaysAgo.setDate(today.getDate() - 7);
+          return expenseDate >= sevenDaysAgo;
+        }
+        case '30days': {
+          const thirtyDaysAgo = new Date(today);
+          thirtyDaysAgo.setDate(today.getDate() - 30);
+          return expenseDate >= thirtyDaysAgo;
+        }
+        case 'thisMonth': {
+          const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+          return expenseDate >= startOfMonth;
+        }
+        case 'custom': {
+          if (!customStartDate || !customEndDate) return false;
+          const start = new Date(customStartDate + 'T00:00:00');
+          const end = new Date(customEndDate + 'T00:00:00');
+          return expenseDate >= start && expenseDate <= end;
+        }
+        default:
+          return true;
+      }
+    });
+  }, [expenses, vehicle.id, filterType, customStartDate, customEndDate]);
+
 
   return (
     <div className="bg-white rounded-xl shadow-md p-6 overflow-y-auto">
@@ -49,14 +96,53 @@ const VehicleDetails: React.FC<VehicleDetailsProps> = ({ vehicle }) => {
           </div>
         </div>
         <div>
-          <h4 className="text-lg font-semibold mb-3 flex items-center"><CurrencyDollarIcon className="w-5 h-5 mr-2 text-gray-500"/>Expenses</h4>
+            <div className="flex justify-between items-center mb-3">
+                <h4 className="text-lg font-semibold flex items-center"><CurrencyDollarIcon className="w-5 h-5 mr-2 text-gray-500"/>Expenses</h4>
+                <button
+                    onClick={onAddExpenseClick}
+                    className="p-1.5 rounded-full bg-orange-500 text-white hover:bg-orange-600 transition"
+                    aria-label="Add Expense"
+                >
+                    <PlusIcon className="w-4 h-4"/>
+                </button>
+            </div>
+             <div className="flex flex-wrap items-center gap-2 mb-3 text-sm">
+                <select
+                    value={filterType}
+                    onChange={(e) => setFilterType(e.target.value)}
+                    className="bg-gray-800 border-gray-600 text-white text-sm rounded-lg focus:ring-orange-500 focus:border-orange-500 block p-2"
+                >
+                    <option value="all">All Time</option>
+                    <option value="7days">Last 7 Days</option>
+                    <option value="30days">Last 30 Days</option>
+                    <option value="thisMonth">This Month</option>
+                    <option value="custom">Custom Range</option>
+                </select>
+                {filterType === 'custom' && (
+                    <div className="flex items-center gap-2 flex-wrap">
+                         <input
+                            type="date"
+                            value={customStartDate}
+                            onChange={(e) => setCustomStartDate(e.target.value)}
+                            className="bg-gray-800 border-gray-600 text-white text-sm rounded-lg focus:ring-orange-500 focus:border-orange-500 block p-2 [color-scheme:dark]"
+                         />
+                         <span>to</span>
+                         <input
+                            type="date"
+                            value={customEndDate}
+                            onChange={(e) => setCustomEndDate(e.target.value)}
+                            className="bg-gray-800 border-gray-600 text-white text-sm rounded-lg focus:ring-orange-500 focus:border-orange-500 block p-2 [color-scheme:dark]"
+                         />
+                    </div>
+                )}
+            </div>
            <div className="space-y-3">
-            {expenseHistory.length > 0 ? expenseHistory.map((item) => (
+            {filteredExpenses.length > 0 ? filteredExpenses.map((item) => (
               <div key={item.id} className="p-3 bg-gray-50 rounded-lg">
                 <p className="font-semibold">{item.description} ({item.expense_type})</p>
-                <p className="text-sm text-gray-500">{new Date(item.expense_date).toLocaleDateString()} - {item.amount} {item.currency}</p>
+                <p className="text-sm text-gray-500">{new Date(item.expense_date + 'T00:00:00').toLocaleDateString()} - {item.amount} {item.currency}</p>
               </div>
-            )) : <p className="text-sm text-gray-500 p-3">No expense records.</p>}
+            )) : <p className="text-sm text-gray-500 p-3">No expense records for the selected period.</p>}
           </div>
         </div>
       </div>

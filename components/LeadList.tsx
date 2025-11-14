@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { Lead, LeadStatus } from '../types';
 import { PlusIcon, SearchIcon, CheckCircleIcon, ExclamationTriangleIcon } from './icons/Icons';
@@ -13,7 +14,6 @@ const getStatusPill = (status: LeadStatus) => {
       return { icon: <PlusIcon className="w-4 h-4 mr-1.5" />, classes: 'bg-indigo-100 text-indigo-800' };
     case LeadStatus.QUALIFIED:
       return { icon: <CheckCircleIcon className="w-4 h-4 mr-1.5" />, classes: 'bg-green-100 text-green-800' };
-    // FIX: Corrected typo from `Lead-Status` to `LeadStatus`.
     case LeadStatus.CONTACTED:
       return { icon: <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 mr-1.5" viewBox="0 0 20 20" fill="currentColor"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" /></svg>, classes: 'bg-yellow-100 text-yellow-800' };
     case LeadStatus.PROPOSAL_SENT:
@@ -25,6 +25,21 @@ const getStatusPill = (status: LeadStatus) => {
     default:
       return { icon: null, classes: 'bg-gray-100 text-gray-800' };
   }
+};
+
+const getScoreIndicatorStyles = (score: number) => {
+  const percentage = Math.min(score, 100);
+  let colorClass = 'bg-red-400';
+  if (score > 70) {
+    colorClass = 'bg-green-500';
+  } else if (score >= 40) {
+    colorClass = 'bg-yellow-400';
+  }
+
+  return {
+    width: `${percentage}%`,
+    colorClass,
+  };
 };
 
 
@@ -62,7 +77,7 @@ const LeadList: React.FC<LeadListProps> = ({ leads, onSelectLead }) => {
               placeholder="Search by name, company, or email..."
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+              className="w-full pl-10 pr-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 bg-gray-800 text-white border-gray-600 placeholder:text-gray-400"
             />
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <SearchIcon className="w-5 h-5 text-gray-400" />
@@ -75,6 +90,7 @@ const LeadList: React.FC<LeadListProps> = ({ leads, onSelectLead }) => {
             <tr>
               <th scope="col" className="px-6 py-3">Name</th>
               <th scope="col" className="px-6 py-3">Company</th>
+              <th scope="col" className="px-6 py-3">Score</th>
               <th scope="col" className="px-6 py-3">Status</th>
             </tr>
           </thead>
@@ -82,6 +98,7 @@ const LeadList: React.FC<LeadListProps> = ({ leads, onSelectLead }) => {
             {filteredLeads.length > 0 ? (
               filteredLeads.map((lead) => {
                 const statusInfo = getStatusPill(lead.lead_status);
+                const scoreStyles = getScoreIndicatorStyles(lead.lead_score);
                 return (
                   <tr 
                     key={lead.id} 
@@ -94,6 +111,17 @@ const LeadList: React.FC<LeadListProps> = ({ leads, onSelectLead }) => {
                     </td>
                     <td className="px-6 py-4">{lead.company_name}</td>
                     <td className="px-6 py-4">
+                        <div className="flex items-center">
+                            <span className="text-gray-900 font-medium w-8 text-right pr-2">{lead.lead_score}</span>
+                            <div className="w-full bg-gray-200 rounded-full h-2">
+                                <div 
+                                    className={`${scoreStyles.colorClass} h-2 rounded-full`}
+                                    style={{ width: scoreStyles.width }}
+                                ></div>
+                            </div>
+                        </div>
+                    </td>
+                    <td className="px-6 py-4">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusInfo.classes}`}>
                         {statusInfo.icon}
                         {lead.lead_status.charAt(0).toUpperCase() + lead.lead_status.slice(1)}
@@ -104,7 +132,7 @@ const LeadList: React.FC<LeadListProps> = ({ leads, onSelectLead }) => {
             })
             ) : (
                 <tr>
-                    <td colSpan={3} className="text-center py-8 text-gray-500">
+                    <td colSpan={4} className="text-center py-8 text-gray-500">
                        No leads found{searchTerm ? ` for "${searchTerm}"` : ''}.
                     </td>
                 </tr>
