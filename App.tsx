@@ -28,7 +28,7 @@ import { mockCampaigns, mockSalesSequences } from './data/mockMarketingData';
 export type View = 'dashboard' | 'fleet' | 'bookings' | 'drivers' | 'customers' | 'routes' | 'reports' | 'leads' | 'campaigns' | 'new-campaign' | 'financials' | 'marketing' | 'settings' | 'analytics';
 
 function App() {
-  const [activeView, setActiveView] = useState<View>('leads');
+  const [activeView, setActiveView] = useState<View>('dashboard');
 
   const contextData = {
     dashboard: {
@@ -68,7 +68,7 @@ function App() {
     switch(activeView) {
       case 'dashboard': return <Dashboard data={contextData.dashboard} />;
       case 'fleet': return <FleetDashboard />;
-      case 'crm': return <CrmDashboard />;
+      // FIX: The 'crm' case caused a type error because 'crm' is not a defined `View` type. It was also redundant as the 'leads' view correctly renders the CrmDashboard.
       case 'financials': return <FinancialsDashboard />;
       case 'routes': return <RoutesDashboard />;
       case 'bookings': return <BookingsPage />;

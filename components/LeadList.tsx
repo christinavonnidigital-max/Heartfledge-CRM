@@ -6,6 +6,7 @@ import { PlusIcon, SearchIcon, CheckCircleIcon, ExclamationTriangleIcon } from '
 interface LeadListProps {
   leads: Lead[];
   onSelectLead: (lead: Lead) => void;
+  onAddLeadClick: () => void;
 }
 
 const getStatusPill = (status: LeadStatus) => {
@@ -43,7 +44,7 @@ const getScoreIndicatorStyles = (score: number) => {
 };
 
 
-const LeadList: React.FC<LeadListProps> = ({ leads, onSelectLead }) => {
+const LeadList: React.FC<LeadListProps> = ({ leads, onSelectLead, onAddLeadClick }) => {
   const [searchTerm, setSearchTerm] = useState('');
 
   const filteredLeads = useMemo(() => {
@@ -66,7 +67,7 @@ const LeadList: React.FC<LeadListProps> = ({ leads, onSelectLead }) => {
             <h2 className="text-xl font-bold">Recent Leads</h2>
             <button 
               className="p-2 rounded-full bg-orange-500 text-white hover:bg-orange-600 transition"
-              onClick={() => alert('Add Lead form would open here.')}
+              onClick={onAddLeadClick}
             >
               <PlusIcon className="w-5 h-5"/>
             </button>

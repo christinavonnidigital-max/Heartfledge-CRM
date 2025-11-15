@@ -1,19 +1,21 @@
+
 import React from 'react';
 import { Expense } from '../types';
 import { PlusIcon } from './icons/Icons';
 
 interface ExpenseListProps {
   expenses: Expense[];
+  onAddExpenseClick: () => void;
 }
 
-const ExpenseList: React.FC<ExpenseListProps> = ({ expenses }) => {
+const ExpenseList: React.FC<ExpenseListProps> = ({ expenses, onAddExpenseClick }) => {
   return (
     <div className="bg-white rounded-xl shadow-md">
       <div className="p-4 border-b border-gray-200 flex justify-between items-center">
         <h2 className="text-xl font-bold">Recent Expenses</h2>
          <button 
           className="p-2 rounded-full bg-orange-500 text-white hover:bg-orange-600 transition"
-          onClick={() => alert('Add Expense form would open here.')}
+          onClick={onAddExpenseClick}
          >
           <PlusIcon className="w-5 h-5"/>
         </button>
@@ -35,7 +37,7 @@ const ExpenseList: React.FC<ExpenseListProps> = ({ expenses }) => {
                     {expense.expense_category.charAt(0).toUpperCase() + expense.expense_category.slice(1)}
                 </td>
                 <td className="px-6 py-4">{expense.description}</td>
-                <td className="px-6 py-4">{new Date(expense.expense_date).toLocaleDateString()}</td>
+                <td className="px-6 py-4">{new Date(expense.expense_date + 'T00:00:00').toLocaleDateString()}</td>
                 <td className="px-6 py-4">${expense.amount_in_base_currency.toLocaleString()}</td>
               </tr>
             ))}

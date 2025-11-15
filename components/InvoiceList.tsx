@@ -1,9 +1,11 @@
+
 import React from 'react';
 import { Invoice, InvoiceStatus } from '../types';
 import { PlusIcon } from './icons/Icons';
 
 interface InvoiceListProps {
   invoices: Invoice[];
+  onAddInvoiceClick: () => void;
 }
 
 const getStatusColor = (status: InvoiceStatus) => {
@@ -17,14 +19,14 @@ const getStatusColor = (status: InvoiceStatus) => {
   }
 };
 
-const InvoiceList: React.FC<InvoiceListProps> = ({ invoices }) => {
+const InvoiceList: React.FC<InvoiceListProps> = ({ invoices, onAddInvoiceClick }) => {
   return (
     <div className="bg-white rounded-xl shadow-md">
       <div className="p-4 border-b border-gray-200 flex justify-between items-center">
         <h2 className="text-xl font-bold">Recent Invoices</h2>
         <button 
           className="p-2 rounded-full bg-orange-500 text-white hover:bg-orange-600 transition"
-          onClick={() => alert('Add Invoice form would open here.')}
+          onClick={onAddInvoiceClick}
         >
           <PlusIcon className="w-5 h-5"/>
         </button>
@@ -47,7 +49,7 @@ const InvoiceList: React.FC<InvoiceListProps> = ({ invoices }) => {
                   {invoice.invoice_number}
                 </td>
                 <td className="px-6 py-4">{invoice.customer_id}</td>
-                <td className="px-6 py-4">{new Date(invoice.due_date).toLocaleDateString()}</td>
+                <td className="px-6 py-4">{new Date(invoice.due_date + 'T00:00:00').toLocaleDateString()}</td>
                 <td className="px-6 py-4">${invoice.total_amount.toLocaleString()}</td>
                 <td className="px-6 py-4">
                   <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(invoice.status)}`}>

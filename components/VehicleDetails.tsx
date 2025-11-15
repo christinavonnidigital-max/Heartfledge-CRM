@@ -1,8 +1,8 @@
 
 import React, { useState, useMemo } from 'react';
-import { Vehicle, VehicleExpense } from '../types';
+import { Vehicle, VehicleExpense, ExpenseType } from '../types';
 import { mockMaintenance } from '../data/mockData';
-import { CogIcon, CurrencyDollarIcon, GaugeIcon, PlusIcon, RoadIcon, WrenchIcon } from './icons/Icons';
+import { CogIcon, CurrencyDollarIcon, GaugeIcon, PlusIcon, RoadIcon, WrenchIcon, FuelIcon, ShieldCheckIcon, ClipboardDocumentIcon, TicketIcon, DocumentDuplicateIcon } from './icons/Icons';
 
 interface VehicleDetailsProps {
   vehicle: Vehicle;
@@ -19,6 +19,25 @@ const StatCard: React.FC<{ icon: React.ReactNode; label: string; value: string |
     </div>
   </button>
 );
+
+const getExpenseTypeUI = (type: ExpenseType) => {
+    switch(type) {
+        case ExpenseType.FUEL:
+            return { icon: <FuelIcon className="w-5 h-5" />, color: 'text-red-600', bgColor: 'bg-red-100' };
+        case ExpenseType.MAINTENANCE:
+            return { icon: <WrenchIcon className="w-5 h-5" />, color: 'text-yellow-600', bgColor: 'bg-yellow-100' };
+        case ExpenseType.INSURANCE:
+            return { icon: <ShieldCheckIcon className="w-5 h-5" />, color: 'text-blue-600', bgColor: 'bg-blue-100' };
+        case ExpenseType.LICENSE:
+            return { icon: <ClipboardDocumentIcon className="w-5 h-5" />, color: 'text-indigo-600', bgColor: 'bg-indigo-100' };
+        case ExpenseType.TOLLS:
+        case ExpenseType.PARKING:
+            return { icon: <TicketIcon className="w-5 h-5" />, color: 'text-purple-600', bgColor: 'bg-purple-100' };
+        case ExpenseType.OTHER:
+        default:
+            return { icon: <DocumentDuplicateIcon className="w-5 h-5" />, color: 'text-gray-600', bgColor: 'bg-gray-100' };
+    }
+}
 
 
 const VehicleDetails: React.FC<VehicleDetailsProps> = ({ vehicle, expenses, onAddExpenseClick }) => {
@@ -137,12 +156,24 @@ const VehicleDetails: React.FC<VehicleDetailsProps> = ({ vehicle, expenses, onAd
                 )}
             </div>
            <div className="space-y-3">
-            {filteredExpenses.length > 0 ? filteredExpenses.map((item) => (
-              <div key={item.id} className="p-3 bg-gray-50 rounded-lg">
-                <p className="font-semibold">{item.description} ({item.expense_type})</p>
-                <p className="text-sm text-gray-500">{new Date(item.expense_date + 'T00:00:00').toLocaleDateString()} - {item.amount} {item.currency}</p>
-              </div>
-            )) : <p className="text-sm text-gray-500 p-3">No expense records for the selected period.</p>}
+            {filteredExpenses.length > 0 ? filteredExpenses.map((item) => {
+                const ui = getExpenseTypeUI(item.expense_type);
+                return (
+                    <div key={item.id} className="p-3 bg-gray-50 rounded-lg flex items-start gap-4">
+                        <div className={`flex-shrink-0 p-2 rounded-full ${ui.bgColor} ${ui.color}`}>
+                            {ui.icon}
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex justify-between items-center">
+                              <p className="font-semibold capitalize">{item.expense_type.replace('_', ' ')}</p>
+                              <p className="font-bold text-gray-800">{item.amount} {item.currency}</p>
+                          </div>
+                          <p className="text-sm text-gray-600">{item.description}</p>
+                          <p className="text-xs text-gray-400 mt-1">{new Date(item.expense_date + 'T00:00:00').toLocaleDateString()}</p>
+                        </div>
+                    </div>
+                )
+            }) : <p className="text-sm text-gray-500 p-3">No expense records for the selected period.</p>}
           </div>
         </div>
       </div>

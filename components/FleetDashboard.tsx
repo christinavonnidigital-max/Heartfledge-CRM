@@ -1,34 +1,50 @@
-
 import React, { useState, useMemo, useEffect } from 'react';
 import { mockVehicles, mockExpenses } from '../data/mockData';
 import { Vehicle, VehicleStatus, VehicleExpense } from '../types';
 import VehicleDetails from './VehicleDetails';
-import { PlusIcon, SearchIcon, IllustrationTruckIcon, CheckCircleIcon } from './icons/Icons';
+import { PlusIcon, SearchIcon, IllustrationTruckIcon, CheckCircleIcon, WrenchIcon, TrashIcon, ExclamationTriangleIcon } from './icons/Icons';
 import EmptyState from './EmptyState';
 import AddExpenseModal from './AddExpenseModal';
+import AddVehicleModal from './AddVehicleModal';
 
 const FleetDashboard: React.FC = () => {
-  const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(mockVehicles.length > 0 ? mockVehicles[0] : null);
+  const [vehicles, setVehicles] = useState<Vehicle[]>(mockVehicles);
+  const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(vehicles.length > 0 ? vehicles[0] : null);
   const [searchTerm, setSearchTerm] = useState('');
   const [expenses, setExpenses] = useState<VehicleExpense[]>(mockExpenses);
   const [isAddExpenseModalOpen, setIsAddExpenseModalOpen] = useState(false);
+  const [isAddVehicleModalOpen, setIsAddVehicleModalOpen] = useState(false);
 
   const filteredVehicles = useMemo(() => {
     if (!searchTerm) {
-      return mockVehicles;
+      return vehicles;
     }
     const lowercasedFilter = searchTerm.toLowerCase();
-    return mockVehicles.filter(vehicle =>
+    return vehicles.filter(vehicle =>
       vehicle.registration_number.toLowerCase().includes(lowercasedFilter) ||
       vehicle.make.toLowerCase().includes(lowercasedFilter)
     );
-  }, [searchTerm]);
+  }, [vehicles, searchTerm]);
 
   useEffect(() => {
-    if (selectedVehicle && !filteredVehicles.find(v => v.id === selectedVehicle.id)) {
-      setSelectedVehicle(null);
+    if (!selectedVehicle && filteredVehicles.length > 0) {
+      setSelectedVehicle(filteredVehicles[0]);
+    } else if (selectedVehicle && !filteredVehicles.find(v => v.id === selectedVehicle.id)) {
+      setSelectedVehicle(filteredVehicles.length > 0 ? filteredVehicles[0] : null);
     }
   }, [searchTerm, selectedVehicle, filteredVehicles]);
+
+  const handleAddVehicle = (newVehicleData: Omit<Vehicle, 'id' | 'created_at' | 'updated_at'>) => {
+    const newVehicle: Vehicle = {
+      ...newVehicleData,
+      id: Date.now(), // Simple unique ID for mock data
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+    setVehicles(prev => [newVehicle, ...prev]);
+    setIsAddVehicleModalOpen(false);
+    setSelectedVehicle(newVehicle);
+  };
 
   const handleAddExpense = (newExpense: Omit<VehicleExpense, 'id' | 'vehicle_id' | 'created_at' | 'recorded_by'>) => {
     if (!selectedVehicle) return;
@@ -47,11 +63,32 @@ const FleetDashboard: React.FC = () => {
   const getStatusPill = (status: VehicleStatus) => {
     switch (status) {
       case VehicleStatus.ACTIVE:
-        return <span className="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800 flex items-center"><CheckCircleIcon className="w-4 h-4 mr-1"/> Active</span>;
+        return <span className="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800 flex items-center gap-1"><CheckCircleIcon className="w-4 h-4"/> Active</span>;
       case VehicleStatus.MAINTENANCE:
-        return <span className="px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800">Maintenance</span>;
+        return <span className="px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800 flex items-center gap-1"><WrenchIcon className="w-4 h-4"/> Maintenance</span>;
+      case VehicleStatus.RETIRED:
+        return <span className="px-2 py-1 text-xs font-medium rounded-full bg-gray-200 text-gray-700 flex items-center gap-1"><TrashIcon className="w-4 h-4"/> Retired</span>;
+      case VehicleStatus.OUT_OF_SERVICE:
+        return <span className="px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800 flex items-center gap-1"><ExclamationTriangleIcon className="w-4 h-4"/> Out of Service</span>;
       default:
-        return <span className="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800">{status.charAt(0).toUpperCase() + status.slice(1)}</span>;
+        // FIX: TypeScript infers `status` as `never` because all enum cases are handled.
+        // Casting to string allows the code to compile and handle any future enum values gracefully.
+        return <span className="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800 capitalize">{(status as string).replace('_', ' ')}</span>;
+    }
+  };
+
+  const getStatusBorder = (status: VehicleStatus) => {
+    switch (status) {
+      case VehicleStatus.ACTIVE:
+        return 'border-green-500';
+      case VehicleStatus.MAINTENANCE:
+        return 'border-yellow-500';
+      case VehicleStatus.RETIRED:
+        return 'border-gray-400';
+      case VehicleStatus.OUT_OF_SERVICE:
+        return 'border-red-500';
+      default:
+        return 'border-transparent';
     }
   };
 
@@ -64,7 +101,7 @@ const FleetDashboard: React.FC = () => {
               <h2 className="text-xl font-bold">Vehicle Fleet ({filteredVehicles.length})</h2>
               <button 
                   className="p-2 rounded-full bg-orange-500 text-white hover:bg-orange-600 transition"
-                  onClick={() => alert('Add Vehicle form would open here.')}
+                  onClick={() => setIsAddVehicleModalOpen(true)}
               >
                 <PlusIcon className="w-5 h-5"/>
               </button>
@@ -89,8 +126,10 @@ const FleetDashboard: React.FC = () => {
                   <li
                     key={vehicle.id}
                     onClick={() => setSelectedVehicle(vehicle)}
-                    className={`p-4 cursor-pointer hover:bg-gray-50 transition ${
-                      selectedVehicle?.id === vehicle.id ? 'bg-orange-50' : ''
+                    className={`py-4 pr-4 pl-3 cursor-pointer hover:bg-gray-50 transition border-l-4 ${
+                      selectedVehicle?.id === vehicle.id 
+                        ? 'bg-orange-50 border-orange-500' 
+                        : getStatusBorder(vehicle.status)
                     }`}
                   >
                     <div className="flex justify-between items-center">
@@ -105,7 +144,7 @@ const FleetDashboard: React.FC = () => {
               </ul>
             ) : (
               <div className="p-8 text-center text-gray-500">
-                  <p>No vehicles found for "{searchTerm}".</p>
+                  <p>No vehicles found{searchTerm ? ` for "${searchTerm}"` : ''}.</p>
               </div>
             )}
           </div>
@@ -120,8 +159,8 @@ const FleetDashboard: React.FC = () => {
           ) : (
              <EmptyState 
                icon={<IllustrationTruckIcon />}
-               title="Select a Vehicle"
-               message="Choose a vehicle from the list to view its details, maintenance history, and expenses."
+               title={vehicles.length > 0 ? "Select a Vehicle" : "No Vehicles in Fleet"}
+               message={vehicles.length > 0 ? "Choose a vehicle from the list to view its details, maintenance history, and expenses." : "Get started by adding your first vehicle to the fleet."}
              />
           )}
         </div>
@@ -130,6 +169,12 @@ const FleetDashboard: React.FC = () => {
         <AddExpenseModal
             onClose={() => setIsAddExpenseModalOpen(false)}
             onAddExpense={handleAddExpense}
+        />
+      )}
+      {isAddVehicleModalOpen && (
+        <AddVehicleModal
+            onClose={() => setIsAddVehicleModalOpen(false)}
+            onAddVehicle={handleAddVehicle}
         />
       )}
     </>

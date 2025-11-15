@@ -1,9 +1,11 @@
+
 import React from 'react';
 import { LeadScoringRule } from '../types';
 import { PlusIcon } from './icons/Icons';
 
 interface LeadScoringRulesProps {
   rules: LeadScoringRule[];
+  onAddRuleClick: () => void;
 }
 
 const ConditionDisplay: React.FC<{ condition: Record<string, any> }> = ({ condition }) => {
@@ -20,14 +22,14 @@ const ConditionDisplay: React.FC<{ condition: Record<string, any> }> = ({ condit
     );
 };
 
-const LeadScoringRules: React.FC<LeadScoringRulesProps> = ({ rules }) => {
+const LeadScoringRules: React.FC<LeadScoringRulesProps> = ({ rules, onAddRuleClick }) => {
   return (
     <div className="bg-white rounded-xl shadow-md h-full flex flex-col">
       <div className="p-4 border-b border-gray-200 flex justify-between items-center">
         <h2 className="text-xl font-bold">Lead Scoring Rules</h2>
         <button 
           className="p-2 rounded-full bg-orange-500 text-white hover:bg-orange-600 transition"
-          onClick={() => alert('Add Rule form would open here.')}
+          onClick={onAddRuleClick}
         >
           <PlusIcon className="w-5 h-5"/>
         </button>
