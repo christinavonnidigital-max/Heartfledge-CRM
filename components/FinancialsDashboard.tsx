@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { mockInvoices, mockAllExpenses } from '../data/mockFinancialsData';
 import InvoiceList from './InvoiceList';
@@ -65,19 +64,20 @@ const FinancialsDashboard: React.FC = () => {
         <>
             <div className="flex flex-col gap-6">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {/* FIX: Resolved a TypeScript error ("Expected 0 arguments, but got 2") by using `Intl.NumberFormat` for currency formatting, which avoids ambiguity with some TypeScript compiler/linter configurations that incorrectly infer the method signature of `toLocaleString`. */}
                     <StatCard 
                         title="Total Revenue (Paid)" 
-                        value={`$${totalRevenue.toLocaleString()}`} 
+                        value={new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD' }).format(totalRevenue)}
                         icon={<CurrencyDollarIcon className="w-6 h-6" />}
                     />
                     <StatCard 
                         title="Total Expenses" 
-                        value={`$${totalExpenses.toLocaleString()}`}
+                        value={new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD' }).format(totalExpenses)}
                         icon={<CurrencyDollarIcon className="w-6 h-6 text-red-500" />}
                     />
                     <StatCard 
                         title="Net Profit" 
-                        value={`$${netProfit.toLocaleString()}`}
+                        value={new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD' }).format(netProfit)}
                         icon={<CurrencyDollarIcon className={`w-6 h-6 ${netProfit > 0 ? 'text-green-500' : 'text-red-500'}`} />}
                     />
                 </div>

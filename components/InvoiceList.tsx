@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Invoice, InvoiceStatus } from '../types';
 import { PlusIcon } from './icons/Icons';
@@ -50,7 +49,8 @@ const InvoiceList: React.FC<InvoiceListProps> = ({ invoices, onAddInvoiceClick }
                 </td>
                 <td className="px-6 py-4">{invoice.customer_id}</td>
                 <td className="px-6 py-4">{new Date(invoice.due_date + 'T00:00:00').toLocaleDateString()}</td>
-                <td className="px-6 py-4">${invoice.total_amount.toLocaleString()}</td>
+                {/* FIX: Resolved a TypeScript error ("Expected 0 arguments, but got 2") by using `Intl.NumberFormat` for currency formatting, which avoids ambiguity with some TypeScript compiler/linter configurations that incorrectly infer the method signature of `toLocaleString`. */}
+                <td className="px-6 py-4">{new Intl.NumberFormat(undefined, { style: 'currency', currency: invoice.currency }).format(invoice.total_amount)}</td>
                 <td className="px-6 py-4">
                   <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(invoice.status)}`}>
                     {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}

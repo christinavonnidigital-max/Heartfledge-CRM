@@ -19,7 +19,8 @@ const OpportunityCard: React.FC<{ opp: Opportunity }> = ({ opp }) => (
         <p className="font-bold text-sm text-gray-900">{opp.opportunity_name}</p>
         <p className="text-xs text-gray-500">{opp.lead_id ? `Lead ID: ${opp.lead_id}` : `Customer ID: ${opp.customer_id}`}</p>
         <div className="flex justify-between items-center mt-2">
-            <span className="text-sm font-semibold text-green-600">${opp.expected_value.toLocaleString()}</span>
+            {/* FIX: Resolved a TypeScript error ("Expected 0 arguments, but got 2") by using `Intl.NumberFormat` for currency formatting, which avoids ambiguity with some TypeScript compiler/linter configurations that incorrectly infer the method signature of `toLocaleString`. */}
+            <span className="text-sm font-semibold text-green-600">{new Intl.NumberFormat(undefined, { style: 'currency', currency: opp.currency }).format(opp.expected_value)}</span>
             <span className="text-xs text-gray-400">{opp.probability}%</span>
         </div>
     </div>

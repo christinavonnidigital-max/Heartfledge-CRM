@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Vehicle, Lead, Opportunity, Invoice, Booking } from '../types';
 import { TruckIcon, BriefcaseIcon, CreditCardIcon, UsersIcon, DocumentTextIcon, CurrencyDollarIcon } from './icons/Icons';
@@ -86,11 +85,14 @@ const Dashboard: React.FC<DashboardProps> = ({ data }) => {
             </div>
             <div>
                 <h3 className="text-gray-500 text-lg font-medium">Total Invoiced Amount</h3>
+                {/* FIX: Resolved a TypeScript error ("Expected 0 arguments, but got 2") by using `Intl.NumberFormat` for currency formatting, which avoids ambiguity with some TypeScript compiler/linter configurations that incorrectly infer the method signature of `toLocaleString`. */}
                 <p className="text-3xl font-bold text-gray-900">
-                    ${invoicedAmount.toLocaleString(undefined, {
+                    {new Intl.NumberFormat(undefined, {
+                        style: 'currency',
+                        currency: 'USD', // Assuming USD as base currency for dashboard summary
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
-                    })}
+                    }).format(invoicedAmount)}
                 </p>
             </div>
         </div>

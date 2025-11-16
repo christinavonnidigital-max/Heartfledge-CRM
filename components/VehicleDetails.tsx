@@ -107,9 +107,9 @@ const VehicleDetails: React.FC<VehicleDetailsProps> = ({ vehicle, expenses, onAd
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6">
-        <StatCard icon={<RoadIcon className="w-6 h-6"/>} label="Current KM" value={vehicle.current_km.toLocaleString()} />
+        <StatCard icon={<RoadIcon className="w-6 h-6"/>} label="Current KM" value={new Intl.NumberFormat().format(vehicle.current_km)} />
         <StatCard icon={<GaugeIcon className="w-6 h-6"/>} label="Capacity" value={`${vehicle.capacity_tonnes} t`} />
-        <StatCard icon={<WrenchIcon className="w-6 h-6"/>} label="Next Service" value={`${vehicle.next_service_due_km.toLocaleString()} km`} />
+        <StatCard icon={<WrenchIcon className="w-6 h-6"/>} label="Next Service" value={`${new Intl.NumberFormat().format(vehicle.next_service_due_km)} km`} />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -119,7 +119,8 @@ const VehicleDetails: React.FC<VehicleDetailsProps> = ({ vehicle, expenses, onAd
             {maintenanceHistory.length > 0 ? maintenanceHistory.map((item) => (
               <div key={item.id} className="p-3 bg-gray-50 rounded-lg">
                 <p className="font-semibold">{item.description}</p>
-                <p className="text-sm text-gray-500">{new Date(item.service_date).toLocaleDateString()} - ${item.cost}</p>
+                {/* FIX: Resolved a TypeScript error ("Expected 0 arguments, but got 2") by using `Intl.NumberFormat` for currency formatting, which avoids ambiguity with some TypeScript compiler/linter configurations that incorrectly infer the method signature of `toLocaleString`. */}
+                <p className="text-sm text-gray-500">{new Date(item.service_date).toLocaleDateString()} - {new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD' }).format(item.cost)}</p>
               </div>
             )) : <p className="text-sm text-gray-500 p-3">No maintenance records.</p>}
           </div>
@@ -170,7 +171,8 @@ const VehicleDetails: React.FC<VehicleDetailsProps> = ({ vehicle, expenses, onAd
               {Object.keys(expenseTotalByCurrency).length > 0 ? (
                   Object.entries(expenseTotalByCurrency).map(([currency, total]) => (
                       <p key={currency} className="text-lg font-bold text-gray-900">
-                          {total.toLocaleString(undefined, { style: 'currency', currency: currency, minimumFractionDigits: 2 })}
+                          {/* FIX: Resolved a TypeScript error where 'total' was inferred as 'unknown'. Explicitly casting to 'Number' ensures type safety for the formatter. */}
+                          {new Intl.NumberFormat(undefined, { style: 'currency', currency: currency, minimumFractionDigits: 2 }).format(Number(total))}
                       </p>
                   ))
               ) : (
@@ -188,7 +190,8 @@ const VehicleDetails: React.FC<VehicleDetailsProps> = ({ vehicle, expenses, onAd
                         <div className="flex-1">
                           <div className="flex justify-between items-center">
                               <p className="font-semibold capitalize">{item.expense_type.replace('_', ' ')}</p>
-                              <p className="font-bold text-gray-800">{item.amount.toLocaleString(undefined, {minimumFractionDigits: 2})} {item.currency}</p>
+                              {/* FIX: Resolved a TypeScript error where `item.amount` was inferred as `unknown`. Explicitly casting to `Number` ensures type safety for the formatter. */}
+                              <p className="font-bold text-gray-800">{new Intl.NumberFormat(undefined, { style: 'currency', currency: item.currency, minimumFractionDigits: 2}).format(Number(item.amount))}</p>
                           </div>
                           <p className="text-sm text-gray-600">{item.description}</p>
                           <p className="text-xs text-gray-400 mt-1">{new Date(item.expense_date + 'T00:00:00').toLocaleDateString()}</p>

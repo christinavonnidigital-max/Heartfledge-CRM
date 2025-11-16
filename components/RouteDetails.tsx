@@ -3,6 +3,7 @@ import React from 'react';
 import { Route } from '../types';
 import { mockWaypoints } from '../data/mockRoutesData';
 import { ClockIcon, MapPinIcon, RoadIcon, ExclamationTriangleIcon } from './icons/Icons';
+import RouteMap from './RouteMap';
 
 interface RouteDetailsProps {
   route: Route;
@@ -18,23 +19,6 @@ const StatCard: React.FC<{ icon: React.ReactNode; label: string; value: string |
   </button>
 );
 
-const RouteMapPlaceholder: React.FC<{route: Route}> = ({route}) => {
-    return (
-        <div className="bg-gray-100 rounded-lg h-64 w-full flex items-center justify-center p-4 border border-gray-200">
-             <svg width="100%" height="100%" viewBox="0 0 200 100">
-                <path d="M 20 80 Q 100 10, 180 80" stroke="#9ca3af" fill="none" strokeWidth="2" strokeDasharray="4 4"/>
-
-                <circle cx="20" cy="80" r="4" fill="#f97316" />
-                <text x="22" y="75" fontSize="6" fill="currentColor">{route.origin_city}</text>
-
-                <circle cx="180" cy="80" r="4" fill="#16a34a" />
-                <text x="150" y="75" fontSize="6" fill="currentColor">{route.destination_city}</text>
-                
-                <text x="50%" y="50%" textAnchor="middle" fontSize="8" fill="#a1a1aa" className="opacity-75">Map Visualization</text>
-            </svg>
-        </div>
-    )
-}
 
 const RouteDetails: React.FC<RouteDetailsProps> = ({ route }) => {
   const waypoints = mockWaypoints.filter((wp) => wp.route_id === route.id);
@@ -51,7 +35,7 @@ const RouteDetails: React.FC<RouteDetailsProps> = ({ route }) => {
         <StatCard icon={<ClockIcon className="w-6 h-6"/>} label="Est. Duration" value={`${route.estimated_duration_hours} hours`} />
       </div>
 
-      <RouteMapPlaceholder route={route} />
+      <RouteMap route={route} waypoints={waypoints} />
 
       <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>

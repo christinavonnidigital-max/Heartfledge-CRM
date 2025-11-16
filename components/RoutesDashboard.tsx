@@ -5,12 +5,12 @@ import { Route, RouteType, RoadConditions } from '../types';
 import RouteDetails from './RouteDetails';
 import { PlusIcon, IllustrationMapIcon } from './icons/Icons';
 import EmptyState from './EmptyState';
-import AddRouteModal from './AddRouteModal';
+import AddRouteForm from './AddRouteForm';
 
 const RoutesDashboard: React.FC = () => {
   const [routes, setRoutes] = useState<Route[]>(mockRoutes);
   const [selectedRoute, setSelectedRoute] = useState<Route | null>(routes.length > 0 ? routes[0] : null);
-  const [isAddRouteModalOpen, setIsAddRouteModalOpen] = useState(false);
+  const [isAddingRoute, setIsAddingRoute] = useState(false);
   const [routeTypeFilter, setRouteTypeFilter] = useState<RouteType | 'all'>('all');
   const [roadConditionFilter, setRoadConditionFilter] = useState<RoadConditions | 'all'>('all');
 
@@ -28,21 +28,20 @@ const RoutesDashboard: React.FC = () => {
 
   useEffect(() => {
     // If there's no selected route, select the first one from the filtered list
-    if (!selectedRoute && filteredRoutes.length > 0) {
+    if (!selectedRoute && filteredRoutes.length > 0 && !isAddingRoute) {
         setSelectedRoute(filteredRoutes[0]);
     } 
     // If the currently selected route is no longer in the filtered list, update the selection
-    else if (selectedRoute && !filteredRoutes.find(r => r.id === selectedRoute.id)) {
+    else if (selectedRoute && !filteredRoutes.find(r => r.id === selectedRoute.id) && !isAddingRoute) {
         setSelectedRoute(filteredRoutes.length > 0 ? filteredRoutes[0] : null);
     }
-  }, [filteredRoutes, selectedRoute]);
+  }, [filteredRoutes, selectedRoute, isAddingRoute]);
 
 
-  const handleAddRoute = (newRouteData: Omit<Route, 'id' | 'created_at' | 'updated_at' | 'border_crossings' | 'toll_gates' | 'total_toll_cost' | 'is_active' | 'is_popular' | 'road_conditions'>) => {
+  const handleAddRoute = (newRouteData: Omit<Route, 'id' | 'created_at' | 'updated_at' | 'border_crossings' | 'toll_gates' | 'total_toll_cost' | 'is_active' | 'is_popular' | 'road_conditions'> & { road_conditions: RoadConditions } ) => {
     const newRoute: Route = {
         ...newRouteData,
         id: Date.now(),
-        road_conditions: RoadConditions.GOOD, // Default value
         border_crossings: [],
         toll_gates: [],
         total_toll_cost: 0,
@@ -52,9 +51,24 @@ const RoutesDashboard: React.FC = () => {
         updated_at: new Date().toISOString(),
     };
     setRoutes(prev => [newRoute, ...prev]);
-    setIsAddRouteModalOpen(false);
+    setIsAddingRoute(false);
     setSelectedRoute(newRoute);
   };
+
+  const handleAddNewClick = () => {
+    setSelectedRoute(null);
+    setIsAddingRoute(true);
+  }
+
+  const handleCancelAdd = () => {
+    setIsAddingRoute(false);
+    setSelectedRoute(filteredRoutes.length > 0 ? filteredRoutes[0] : null);
+  }
+  
+  const handleSelectRoute = (route: Route) => {
+    setIsAddingRoute(false);
+    setSelectedRoute(route);
+  }
 
   const getRouteTypeColor = (type: RouteType) => {
     switch (type) {
@@ -76,7 +90,7 @@ const RoutesDashboard: React.FC = () => {
                 <h2 className="text-xl font-bold">Company Routes ({filteredRoutes.length})</h2>
                 <button 
                 className="p-2 rounded-full bg-orange-500 text-white hover:bg-orange-600 transition"
-                onClick={() => setIsAddRouteModalOpen(true)}
+                onClick={handleAddNewClick}
                 >
                 <PlusIcon className="w-5 h-5"/>
                 </button>
@@ -109,9 +123,9 @@ const RoutesDashboard: React.FC = () => {
               {filteredRoutes.map((route) => (
                 <li
                   key={route.id}
-                  onClick={() => setSelectedRoute(route)}
+                  onClick={() => handleSelectRoute(route)}
                   className={`p-4 cursor-pointer hover:bg-gray-50 transition ${
-                    selectedRoute?.id === route.id ? 'bg-orange-50 border-l-4 border-orange-500' : 'border-l-4 border-transparent'
+                    selectedRoute?.id === route.id && !isAddingRoute ? 'bg-orange-50 border-l-4 border-orange-500' : 'border-l-4 border-transparent'
                   }`}
                 >
                   <div className="flex justify-between items-center">
@@ -138,7 +152,9 @@ const RoutesDashboard: React.FC = () => {
           </div>
         </div>
         <div className="lg:col-span-2 flex flex-col gap-6">
-          {selectedRoute ? (
+          {isAddingRoute ? (
+             <AddRouteForm onAddRoute={handleAddRoute} onCancel={handleCancelAdd} />
+          ) : selectedRoute ? (
             <RouteDetails route={selectedRoute} />
           ) : (
             <EmptyState
@@ -149,12 +165,6 @@ const RoutesDashboard: React.FC = () => {
           )}
         </div>
       </div>
-      {isAddRouteModalOpen && (
-          <AddRouteModal 
-            onClose={() => setIsAddRouteModalOpen(false)}
-            onAddRoute={handleAddRoute}
-          />
-      )}
     </>
   );
 };

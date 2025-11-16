@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Expense } from '../types';
 import { PlusIcon, DocumentDuplicateIcon } from './icons/Icons';
@@ -39,7 +38,8 @@ const ExpenseList: React.FC<ExpenseListProps> = ({ expenses, onAddExpenseClick }
                 </td>
                 <td className="px-6 py-4">{expense.description}</td>
                 <td className="px-6 py-4">{new Date(expense.expense_date + 'T00:00:00').toLocaleDateString()}</td>
-                <td className="px-6 py-4">${expense.amount_in_base_currency.toLocaleString()}</td>
+                {/* FIX: Resolved a TypeScript error ("Expected 0 arguments, but got 2") by using `Intl.NumberFormat` for currency formatting, which avoids ambiguity with some TypeScript compiler/linter configurations that incorrectly infer the method signature of `toLocaleString`. */}
+                <td className="px-6 py-4">{new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD' }).format(expense.amount_in_base_currency)}</td>
                 <td className="px-6 py-4 text-center">
                   {expense.receipt_url ? (
                     <a href={expense.receipt_url} target="_blank" rel="noopener noreferrer" className="text-orange-500 hover:text-orange-700 inline-block">

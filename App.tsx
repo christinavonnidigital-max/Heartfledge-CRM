@@ -23,6 +23,7 @@ import { mockInvoices, mockAllExpenses } from './data/mockFinancialsData';
 import { mockRoutes, mockWaypoints } from './data/mockRoutesData';
 import { mockBookings } from './data/mockBookingsData';
 import { mockCampaigns, mockSalesSequences } from './data/mockMarketingData';
+import { mockDrivers, mockDriverAssignments, mockUsersForDrivers } from './data/mockDriversData';
 
 
 export type View = 'dashboard' | 'fleet' | 'bookings' | 'drivers' | 'customers' | 'routes' | 'reports' | 'leads' | 'campaigns' | 'new-campaign' | 'financials' | 'marketing' | 'settings' | 'analytics';
@@ -42,6 +43,11 @@ function App() {
       vehicles: mockVehicles,
       maintenance: mockMaintenance,
       expenses: mockExpenses,
+    },
+    drivers: {
+      drivers: mockDrivers,
+      assignments: mockDriverAssignments,
+      users: mockUsersForDrivers,
     },
     crm: {
       leads: mockLeads,
@@ -72,7 +78,7 @@ function App() {
       case 'financials': return <FinancialsDashboard />;
       case 'routes': return <RoutesDashboard />;
       case 'bookings': return <BookingsPage />;
-      case 'drivers': return <DriversPage />;
+      case 'drivers': return <DriversPage data={contextData.drivers} />;
       case 'customers': return <CustomersPage />;
       case 'reports': return <ReportsPage />;
       case 'leads': return <CrmDashboard />; // leads is main part of CRM
@@ -86,7 +92,7 @@ function App() {
   
   const getContext = () => {
     if (activeView === 'leads') return contextData.crm;
-    if (['dashboard', 'fleet', 'crm', 'financials', 'routes', 'marketing', 'new-campaign', 'analytics'].includes(activeView)) {
+    if (['dashboard', 'fleet', 'crm', 'financials', 'routes', 'marketing', 'new-campaign', 'analytics', 'drivers'].includes(activeView)) {
         return contextData[activeView as keyof typeof contextData] || contextData.marketing;
     }
     return contextData.dashboard; // Default context
