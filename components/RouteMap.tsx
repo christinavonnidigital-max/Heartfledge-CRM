@@ -35,6 +35,7 @@ const RouteMap: React.FC<RouteMapProps> = ({ route, waypoints }) => {
     const destination: L.LatLngTuple = [route.destination_latitude!, route.destination_longitude!];
     
     const waypointPositions = waypoints
+      .filter(wp => wp.latitude != null && wp.longitude != null) // Ensure waypoints have coordinates
       .sort((a, b) => a.waypoint_order - b.waypoint_order)
       .map(wp => [wp.latitude, wp.longitude] as L.LatLngTuple);
 
@@ -47,9 +48,17 @@ const RouteMap: React.FC<RouteMapProps> = ({ route, waypoints }) => {
     const map = useMap();
     useEffect(() => {
       if (bounds.isValid()) {
-        map.fitBounds(bounds, { padding: [50, 50] });
+        // Check if the bounds represent a single point (south-west corner equals north-east corner).
+        if (bounds.getSouthWest().equals(bounds.getNorthEast())) {
+          map.setView(bounds.getCenter(), 13); // Set a sensible default zoom for a single location.
+        } else {
+          // Apply responsive padding for a better fit on different screen sizes.
+          const isMobile = window.innerWidth < 768; // Tailwind's 'md' breakpoint
+          const padding: L.PointTuple = isMobile ? [25, 25] : [50, 50];
+          map.fitBounds(bounds, { padding });
+        }
       }
-    }, [map, bounds]);
+    }, [map, bounds]); // Reruns only when map instance or bounds change
     return null;
   };
 

@@ -18,12 +18,22 @@ type StatCardProps = {
 
 const StatCard: React.FC<StatCardProps> = ({ label, value, icon }) => {
   return (
-    <div className="bg-white p-4 rounded-xl shadow-md flex items-center">
-        <div className="p-3 bg-orange-100 text-orange-600 rounded-full mr-4">{icon}</div>
-        <div>
-            <h3 className="text-gray-500 text-sm font-medium uppercase tracking-wider">{label}</h3>
-            <p className="text-2xl font-bold text-gray-900">{value}</p>
+    <div
+      className="flex flex-col justify-between rounded-2xl bg-white px-4 py-3 shadow-sm ring-1 ring-slate-100"
+    >
+      <div className="flex items-center justify-between">
+        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-orange-50 text-orange-500">
+          {icon}
         </div>
+      </div>
+      <div className="mt-3">
+        <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
+          {label}
+        </p>
+        <p className="mt-1 text-xl font-semibold text-slate-900">
+          {value}
+        </p>
+      </div>
     </div>
   );
 };
@@ -50,31 +60,31 @@ const Dashboard: React.FC<DashboardProps> = ({ data }) => {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
         <StatCard
           label="Vehicles"
           value={totalVehicles}
-          icon={<TruckIcon className="w-6 h-6" />}
+          icon={<TruckIcon className="w-5 h-5" />}
         />
         <StatCard
           label="Leads"
           value={totalLeads}
-          icon={<BriefcaseIcon className="w-6 h-6" />}
+          icon={<BriefcaseIcon className="w-5 h-5" />}
         />
         <StatCard
           label="Opportunities"
           value={totalOpps}
-          icon={<UsersIcon className="w-6 h-6" />}
+          icon={<UsersIcon className="w-5 h-5" />}
         />
         <StatCard
           label="Invoices"
           value={totalInvoices}
-          icon={<CreditCardIcon className="w-6 h-6" />}
+          icon={<CreditCardIcon className="w-5 h-5" />}
         />
         <StatCard
           label="Bookings"
           value={totalBookings}
-          icon={<DocumentTextIcon className="w-6 h-6" />}
+          icon={<DocumentTextIcon className="w-5 h-5" />}
         />
       </div>
 

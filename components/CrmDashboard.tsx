@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { mockLeads, mockOpportunities, mockLeadScoringRules, mockSalesReps, mockLeadActivities } from '../data/mockCrmData';
 import SalesPipeline from './SalesPipeline';
@@ -9,6 +8,22 @@ import { Lead, LeadScoringRule } from '../types';
 import AddLeadModal from './AddLeadModal';
 import AddLeadScoringRuleModal from './AddLeadScoringRuleModal';
 import { calculateLeadScore } from '../services/crmService';
+import { BriefcaseIcon, CurrencyDollarIcon, UsersIcon } from './icons/Icons';
+
+const StatCard = ({ label, value, icon }: { label: string, value: string | number, icon: React.ReactNode }) => (
+  <div className="flex flex-col justify-between rounded-2xl bg-white px-4 py-3 shadow-sm ring-1 ring-slate-100">
+    <div className="flex items-center justify-between">
+      <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-orange-50 text-orange-500">
+        {icon}
+      </div>
+    </div>
+    <div className="mt-3">
+      <p className="text-xs font-medium uppercase tracking-wide text-slate-500">{label}</p>
+      <p className="mt-1 text-xl font-semibold text-slate-900">{value}</p>
+    </div>
+  </div>
+);
+
 
 const CrmDashboard: React.FC = () => {
     const [leads, setLeads] = useState<Lead[]>(mockLeads);
@@ -71,19 +86,22 @@ const CrmDashboard: React.FC = () => {
   return (
     <>
         <div className="flex flex-col gap-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-white p-6 rounded-xl shadow-md">
-                    <h3 className="text-gray-500 text-lg">Total Pipeline Value</h3>
-                    <p className="text-3xl font-bold text-gray-900">${new Intl.NumberFormat().format(totalPipelineValue)}</p>
-                </div>
-                 <div className="bg-white p-6 rounded-xl shadow-md">
-                    <h3 className="text-gray-500 text-lg">New Leads</h3>
-                    <p className="text-3xl font-bold text-gray-900">{newLeadsCount}</p>
-                </div>
-                 <div className="bg-white p-6 rounded-xl shadow-md">
-                    <h3 className="text-gray-500 text-lg">Opportunities</h3>
-                    <p className="text-3xl font-bold text-gray-900">{mockOpportunities.length}</p>
-                </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <StatCard 
+                    label="Total Pipeline Value" 
+                    value={`$${new Intl.NumberFormat().format(totalPipelineValue)}`}
+                    icon={<CurrencyDollarIcon className="w-5 h-5" />}
+                />
+                <StatCard 
+                    label="New Leads" 
+                    value={newLeadsCount}
+                    icon={<BriefcaseIcon className="w-5 h-5" />}
+                />
+                <StatCard 
+                    label="Opportunities" 
+                    value={mockOpportunities.length}
+                    icon={<UsersIcon className="w-5 h-5" />}
+                />
             </div>
             <SalesPipeline opportunities={mockOpportunities} />
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

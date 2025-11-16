@@ -10,14 +10,26 @@ interface VehicleDetailsProps {
 }
 
 const StatCard: React.FC<{ icon: React.ReactNode; label: string; value: string | number }> = ({ icon, label, value }) => (
-  <button className="bg-gray-50 p-4 rounded-lg flex items-center text-left w-full hover:bg-gray-100 transition" onClick={() => alert(`Viewing details for ${label}`)}>
-    <div className="p-3 bg-orange-100 text-orange-600 rounded-full mr-4">{icon}</div>
-    <div>
-      <p className="text-sm text-gray-500">{label}</p>
-      <p className="text-lg font-bold text-gray-900">{value}</p>
+  <button 
+    className="flex flex-col justify-between rounded-2xl bg-white px-4 py-3 shadow-sm ring-1 ring-slate-100 text-left w-full hover:bg-slate-50 transition" 
+    onClick={() => alert(`Viewing details for ${label}`)}
+  >
+    <div className="flex items-center justify-between">
+      <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-orange-50 text-orange-500">
+        {icon}
+      </div>
+    </div>
+    <div className="mt-3">
+      <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
+        {label}
+      </p>
+      <p className="mt-1 text-xl font-semibold text-slate-900">
+        {value}
+      </p>
     </div>
   </button>
 );
+
 
 const getExpenseTypeUI = (type: ExpenseType) => {
     switch(type) {
@@ -107,9 +119,9 @@ const VehicleDetails: React.FC<VehicleDetailsProps> = ({ vehicle, expenses, onAd
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6">
-        <StatCard icon={<RoadIcon className="w-6 h-6"/>} label="Current KM" value={new Intl.NumberFormat().format(vehicle.current_km)} />
-        <StatCard icon={<GaugeIcon className="w-6 h-6"/>} label="Capacity" value={`${vehicle.capacity_tonnes} t`} />
-        <StatCard icon={<WrenchIcon className="w-6 h-6"/>} label="Next Service" value={`${new Intl.NumberFormat().format(vehicle.next_service_due_km)} km`} />
+        <StatCard icon={<RoadIcon className="w-5 h-5"/>} label="Current KM" value={new Intl.NumberFormat().format(vehicle.current_km)} />
+        <StatCard icon={<GaugeIcon className="w-5 h-5"/>} label="Capacity" value={`${vehicle.capacity_tonnes} t`} />
+        <StatCard icon={<WrenchIcon className="w-5 h-5"/>} label="Next Service" value={`${new Intl.NumberFormat().format(vehicle.next_service_due_km)} km`} />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

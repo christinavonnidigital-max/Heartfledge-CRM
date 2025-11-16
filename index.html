@@ -22,6 +22,26 @@
         font-family: Inter, sans-serif;
         font-size: 14px;
       }
+      /* Custom Scrollbar Styling */
+      .custom-scrollbar {
+        /* Firefox */
+        scrollbar-width: thin;
+        scrollbar-color: #475569 #1e293b; /* thumb track */
+      }
+      /* WebKit */
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 8px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: #1e293b; /* slate-800 */
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #475569; /* slate-600 */
+        border-radius: 4px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #64748b; /* slate-500 */
+      }
     </style>
   <script type="importmap">
 {
@@ -32,8 +52,8 @@
     "react": "https://aistudiocdn.com/react@^19.2.0",
     "@google/genai": "https://aistudiocdn.com/@google/genai@^1.29.1",
     "leaflet": "https://esm.sh/leaflet@1.9.4",
-    "react-leaflet": "https://esm.sh/react-leaflet@4.2.1",
-    "@react-leaflet/core": "https://esm.sh/@react-leaflet/core@2.1.0"
+    "react-leaflet": "https://esm.sh/react-leaflet@4.2.1?external=react,react-dom",
+    "@react-leaflet/core": "https://esm.sh/@react-leaflet/core@2.1.0?external=react,react-dom"
   }
 }
 </script>
