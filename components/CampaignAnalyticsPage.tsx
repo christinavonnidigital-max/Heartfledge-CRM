@@ -1,11 +1,27 @@
+
 import React from 'react';
+// FIX: Corrected import for EmptyState from './EmptyState' instead of './UiKit'.
+import { ShellCard, SectionHeader } from './UiKit';
+import EmptyState from './EmptyState';
+import { ChartPieIcon } from './icons/Icons';
 
 const CampaignAnalyticsPage: React.FC = () => {
   return (
-    <div className="bg-white rounded-xl shadow-md p-6">
-      <h1 className="text-2xl font-bold text-gray-900">Campaign Analytics</h1>
-      <p className="mt-2 text-gray-600">This page will display key campaign metrics, charts, and performance breakdowns.</p>
-    </div>
+    <ShellCard>
+      <div className="p-4 border-b border-slate-100">
+        <SectionHeader
+          title="Campaign Performance"
+          subtitle="See what channels are working"
+        />
+      </div>
+      <div className="h-96">
+        <EmptyState
+          icon={<ChartPieIcon className="h-14 w-14" />}
+          title="Analytics in Development"
+          message="This section will contain detailed analytics for your campaigns, including open rates, click-through rates, reply rates, and performance over time."
+        />
+      </div>
+    </ShellCard>
   );
 };
 

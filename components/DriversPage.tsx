@@ -1,10 +1,11 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { Driver, User, DriverAssignment, EmploymentStatus } from '../types';
-import { PlusIcon, SearchIcon, IllustrationTruckIcon, CheckCircleIcon, ExclamationTriangleIcon, TrashIcon, UserCircleIcon } from './icons/Icons';
+import { PlusIcon, SearchIcon, IllustrationTruckIcon } from './icons/Icons';
 import EmptyState from './EmptyState';
 import AddDriverModal from './AddDriverModal';
 import DriverDetails from './DriverDetails';
+import { ShellCard, SectionHeader, StatusPill } from './UiKit';
 
 interface DriversPageProps {
   data: {
@@ -16,8 +17,6 @@ interface DriversPageProps {
 
 const DriversPage: React.FC<DriversPageProps> = ({ data }) => {
   const [drivers, setDrivers] = useState<Driver[]>(data.drivers);
-  // FIX: Changed state type to accommodate the 'user' property and initialized to null.
-  // The useEffect hook now correctly handles the initial selection.
   const [selectedDriver, setSelectedDriver] = useState<(Driver & { user?: User }) | null>(null);
   const [isAddDriverModalOpen, setIsAddDriverModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -58,7 +57,6 @@ const DriversPage: React.FC<DriversPageProps> = ({ data }) => {
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
     };
-    // In a real app, you'd add the user to the users table first. Here we just mock it.
     
     const newDriver: Driver = {
       ...newDriverData,
@@ -68,57 +66,54 @@ const DriversPage: React.FC<DriversPageProps> = ({ data }) => {
       updated_at: new Date().toISOString(),
     };
     setDrivers(prev => [newDriver, ...prev]);
-    // In a real app, you'd also update the main user list.
     setIsAddDriverModalOpen(false);
     setSelectedDriver({ ...newDriver, user: newUser });
   };
-
-  const getStatusPill = (status: EmploymentStatus) => {
+  
+  const getStatusTone = (status: EmploymentStatus) => {
     switch (status) {
-      case EmploymentStatus.ACTIVE:
-        return <span className="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800 flex items-center gap-1"><CheckCircleIcon className="w-4 h-4"/> Active</span>;
-      case EmploymentStatus.ON_LEAVE:
-        return <span className="px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800 flex items-center gap-1"><UserCircleIcon className="w-4 h-4"/> On Leave</span>;
-      case EmploymentStatus.SUSPENDED:
-        return <span className="px-2 py-1 text-xs font-medium rounded-full bg-orange-100 text-orange-800 flex items-center gap-1"><ExclamationTriangleIcon className="w-4 h-4"/> Suspended</span>;
-      case EmploymentStatus.TERMINATED:
-        return <span className="px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800 flex items-center gap-1"><TrashIcon className="w-4 h-4"/> Terminated</span>;
-      default:
-        return <span className="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800 capitalize">{(status as string).replace('_', ' ')}</span>;
+        case EmploymentStatus.ACTIVE: return 'success';
+        case EmploymentStatus.ON_LEAVE: return 'info';
+        case EmploymentStatus.SUSPENDED: return 'warn';
+        case EmploymentStatus.TERMINATED: return 'danger';
+        default: return 'neutral';
     }
-  };
+  }
 
   return (
     <>
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-1 bg-white rounded-xl shadow-md flex flex-col">
-          <div className="p-4 border-b border-gray-200">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold">Drivers ({filteredDrivers.length})</h2>
-              <button 
-                  className="p-2 rounded-full bg-orange-500 text-white hover:bg-orange-600 transition"
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,320px)_minmax(0,1fr)]">
+        <ShellCard className="flex flex-col p-4">
+            <SectionHeader
+              title={`Driver Roster (${filteredDrivers.length})`}
+              subtitle="Manage driver profiles and compliance"
+              actions={
+                <button
+                  className="p-2 rounded-lg bg-orange-500 text-white hover:bg-orange-600 transition flex-shrink-0"
                   onClick={() => setIsAddDriverModalOpen(true)}
-              >
-                <PlusIcon className="w-5 h-5"/>
-              </button>
-            </div>
-            <div className="flex flex-col sm:flex-row gap-2">
+                  aria-label="Add new driver"
+                >
+                  <PlusIcon className="w-5 h-5" />
+                </button>
+              }
+            />
+            <div className="mt-2 flex flex-col sm:flex-row gap-2">
               <div className="relative flex-grow">
                 <input
                   type="text"
                   placeholder="Filter by name..."
                   value={searchTerm}
                   onChange={e => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm"
                 />
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <SearchIcon className="w-5 h-5 text-gray-400" />
+                  <SearchIcon className="w-4 h-4 text-slate-400" />
                 </div>
               </div>
                <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value as EmploymentStatus | 'all')}
-                  className="rounded-md border border-gray-300 bg-white text-gray-900 pl-3 pr-8 py-2 text-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
+                  className="rounded-xl border border-slate-200 bg-white text-slate-900 pl-3 pr-8 py-2 text-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
                 >
                   <option value="all">All Statuses</option>
                   {Object.values(EmploymentStatus).map(status => (
@@ -126,38 +121,37 @@ const DriversPage: React.FC<DriversPageProps> = ({ data }) => {
                   ))}
                 </select>
             </div>
-          </div>
-          <div className="overflow-y-auto">
+          <div className="mt-3 -mx-2 px-2 flex-1 space-y-1 overflow-y-auto">
             {filteredDrivers.length > 0 ? (
-              <ul className="divide-y divide-gray-200">
-                {filteredDrivers.map((driver) => (
-                  <li
-                    key={driver.id}
-                    onClick={() => setSelectedDriver(driver)}
-                    className={`p-4 cursor-pointer hover:bg-gray-50 transition ${
-                      selectedDriver?.id === driver.id 
-                        ? 'bg-orange-50 border-l-4 border-orange-500' 
-                        : 'border-l-4 border-transparent'
-                    }`}
-                  >
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <p className="font-semibold text-gray-900">{driver.user?.first_name} {driver.user?.last_name}</p>
-                        <p className="text-sm text-gray-500">{driver.license_number}</p>
+                filteredDrivers.map((driver) => {
+                  const isSelected = selectedDriver?.id === driver.id;
+                  return (
+                    <button
+                      key={driver.id}
+                      onClick={() => setSelectedDriver(driver)}
+                      className={`w-full text-left rounded-xl px-3 py-2.5 transition ${
+                        isSelected ? "bg-orange-50 border border-orange-200" : "hover:bg-slate-50"
+                      }`}
+                    >
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <p className="font-semibold text-slate-900">{driver.user?.first_name} {driver.user?.last_name}</p>
+                          <p className="text-sm text-slate-500">{driver.license_number}</p>
+                        </div>
+                        <StatusPill label={driver.employment_status.replace('_', ' ')} tone={getStatusTone(driver.employment_status)} />
                       </div>
-                      {getStatusPill(driver.employment_status)}
-                    </div>
-                  </li>
-                ))}
-              </ul>
+                    </button>
+                  )
+                })
             ) : (
-              <div className="p-8 text-center text-gray-500">
+              <div className="p-8 text-center text-slate-500">
                   <p>No drivers found{searchTerm ? ` for "${searchTerm}"` : ''}.</p>
               </div>
             )}
           </div>
-        </div>
-        <div className="lg:col-span-2 flex flex-col gap-6">
+        </ShellCard>
+        
+        <div className="flex flex-col">
           {selectedDriver ? (
             <DriverDetails 
                 driver={selectedDriver}

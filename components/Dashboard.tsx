@@ -20,6 +20,7 @@ import {
   Pie,
   Cell,
 } from 'recharts';
+import { AppSettings } from '../App';
 
 type DashboardData = {
   vehicles: Vehicle[];
@@ -31,6 +32,7 @@ type DashboardData = {
 
 type DashboardProps = {
   data: DashboardData;
+  settings: AppSettings;
 };
 
 type StatCardProps = {
@@ -70,12 +72,14 @@ type RevenueCardProps = {
   totalInvoiced: number;
   openInvoices: number;
   paidInvoices: number;
+  currency: 'ZAR' | 'USD';
 };
 
 const RevenueCard: React.FC<RevenueCardProps> = ({
   totalInvoiced,
   openInvoices,
   paidInvoices,
+  currency,
 }) => {
   const totalInvoices = openInvoices + paidInvoices;
   const paidRatio = totalInvoices
@@ -84,7 +88,7 @@ const RevenueCard: React.FC<RevenueCardProps> = ({
 
   const formattedTotal = new Intl.NumberFormat('en-US', {
     style: 'currency',
-    currency: 'USD',
+    currency: currency,
   }).format(totalInvoiced || 0);
 
   return (
@@ -112,7 +116,7 @@ const RevenueCard: React.FC<RevenueCardProps> = ({
 
       <div className="mt-4">
         <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
-          Total invoiced
+          Total invoiced ({currency})
         </p>
         <p className="mt-1 text-3xl font-semibold tracking-tight text-slate-900">
           {formattedTotal}
@@ -200,8 +204,9 @@ const processRevenueByCategoryData = (invoices: Invoice[]) => {
     return Object.entries(dataByCategory).map(([name, value]) => ({ name, value }));
 };
 
-const RevenueTrendChart = ({ invoices }: { invoices: Invoice[] }) => {
+const RevenueTrendChart = ({ invoices, currency }: { invoices: Invoice[], currency: 'ZAR' | 'USD' }) => {
   const data = processRevenueTrendData(invoices);
+  const currencySymbol = currency === 'ZAR' ? 'R' : '$';
 
   return (
     <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-100 h-80 flex flex-col">
@@ -210,10 +215,10 @@ const RevenueTrendChart = ({ invoices }: { invoices: Invoice[] }) => {
         <LineChart data={data} margin={{ top: 20, right: 20, left: 20, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" vertical={false} />
           <XAxis dataKey="name" tick={{ fontSize: 12 }} stroke="#94a3b8" />
-          <YAxis tick={{ fontSize: 12 }} stroke="#94a3b8" tickFormatter={(value) => `$${(value as number / 1000)}k`} />
+          <YAxis tick={{ fontSize: 12 }} stroke="#94a3b8" tickFormatter={(value) => `${currencySymbol}${(value as number / 1000)}k`} />
           <Tooltip 
             contentStyle={{ backgroundColor: 'white', borderRadius: '0.75rem', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)' }}
-            formatter={(value: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value)}
+            formatter={(value: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: currency }).format(value)}
           />
           <Line type="monotone" dataKey="Revenue" stroke="#06D6A0" strokeWidth={2} activeDot={{ r: 6 }} dot={{r: 4, fill: '#06D6A0'}} />
         </LineChart>
@@ -222,7 +227,7 @@ const RevenueTrendChart = ({ invoices }: { invoices: Invoice[] }) => {
   );
 };
 
-const RevenueByCategoryChart = ({ invoices }: { invoices: Invoice[] }) => {
+const RevenueByCategoryChart = ({ invoices, currency }: { invoices: Invoice[], currency: 'ZAR' | 'USD' }) => {
     const data = processRevenueByCategoryData(invoices);
     const COLORS = ['#06D6A0', '#FFD166', '#83E8BA', '#C77DFF'];
 
@@ -258,7 +263,7 @@ const RevenueByCategoryChart = ({ invoices }: { invoices: Invoice[] }) => {
                     </Pie>
                     <Tooltip 
                         contentStyle={{ backgroundColor: 'white', borderRadius: '0.75rem', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)' }} 
-                        formatter={(value: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value)}
+                        formatter={(value: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: currency }).format(value)}
                     />
                     <Legend iconSize={10} wrapperStyle={{fontSize: "12px", paddingTop: "10px"}}/>
                 </PieChart>
@@ -268,7 +273,7 @@ const RevenueByCategoryChart = ({ invoices }: { invoices: Invoice[] }) => {
 };
 
 
-const Dashboard: React.FC<DashboardProps> = ({ data }) => {
+const Dashboard: React.FC<DashboardProps> = ({ data, settings }) => {
   const { vehicles, leads, opportunities, invoices, bookings } = data;
 
   const totalVehicles = vehicles?.length || 0;
@@ -341,19 +346,24 @@ const Dashboard: React.FC<DashboardProps> = ({ data }) => {
       </section>
 
       {/* Revenue summary */}
-      <section>
-        <RevenueCard
-          totalInvoiced={invoicedAmount}
-          openInvoices={openInvoices.length}
-          paidInvoices={paidInvoices.length}
-        />
-      </section>
-      
-      {/* Revenue Charts */}
-      <section className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <RevenueTrendChart invoices={invoices || []} />
-        <RevenueByCategoryChart invoices={invoices || []} />
-      </section>
+      {settings.showFinancialSummary && (
+        <>
+          <section>
+            <RevenueCard
+              totalInvoiced={invoicedAmount}
+              openInvoices={openInvoices.length}
+              paidInvoices={paidInvoices.length}
+              currency={settings.currency}
+            />
+          </section>
+          
+          {/* Revenue Charts */}
+          <section className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <RevenueTrendChart invoices={invoices || []} currency={settings.currency} />
+            <RevenueByCategoryChart invoices={invoices || []} currency={settings.currency} />
+          </section>
+        </>
+      )}
 
       {/* Recent activity */}
       <section className="grid gap-6 lg:grid-cols-2">

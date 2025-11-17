@@ -8,16 +8,16 @@ import { CurrencyDollarIcon } from './icons/Icons';
 import AddInvoiceModal from './AddInvoiceModal';
 import AddGlobalExpenseModal from './AddGlobalExpenseModal';
 
-const StatCard: React.FC<{ label: string; value: number; icon: React.ReactNode }> = ({ label, value, icon }) => (
+const StatCard: React.FC<{ label: string; value: number; icon: React.ReactNode; valueColor?: string }> = ({ label, value, icon, valueColor = 'text-slate-900' }) => (
     <div className="flex flex-col justify-between rounded-2xl bg-white px-4 py-3 shadow-sm ring-1 ring-slate-100">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-orange-50 text-orange-500">
                 {icon}
             </div>
         </div>
         <div className="mt-3">
             <p className="text-xs font-medium uppercase tracking-wide text-slate-500">{label}</p>
-            <p className="mt-1 text-xl font-semibold text-slate-900">
+            <p className={`mt-1 text-xl font-semibold ${valueColor}`}>
                 {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value)}
             </p>
         </div>
@@ -82,7 +82,8 @@ const FinancialsDashboard: React.FC = () => {
                     <StatCard 
                         label="Net Profit" 
                         value={netProfit}
-                        icon={<CurrencyDollarIcon className={`w-5 h-5 ${netProfit > 0 ? 'text-green-500' : 'text-red-500'}`} />}
+                        valueColor={netProfit >= 0 ? 'text-emerald-600' : 'text-rose-600'}
+                        icon={<CurrencyDollarIcon className="w-5 h-5" />}
                     />
                 </div>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

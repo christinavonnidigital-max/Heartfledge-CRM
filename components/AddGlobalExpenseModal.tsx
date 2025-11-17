@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Expense, ExpenseCategory, Currency, PaymentMethod, ExpensePaymentStatus } from '../types';
-import { CloseIcon } from './icons/Icons';
+import { CloseIcon, DocumentDuplicateIcon } from './icons/Icons';
 
 interface AddGlobalExpenseModalProps {
   onClose: () => void;
@@ -21,7 +21,7 @@ const AddGlobalExpenseModal: React.FC<AddGlobalExpenseModalProps> = ({ onClose, 
     payment_status: ExpensePaymentStatus.PAID,
     is_recurring: false,
   });
-  const [receiptUrl, setReceiptUrl] = useState<string | undefined>();
+  const [receiptFile, setReceiptFile] = useState<{ name: string; type: string; url: string; } | null>(null);
   const [error, setError] = useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -36,9 +36,15 @@ const AddGlobalExpenseModal: React.FC<AddGlobalExpenseModalProps> = ({ onClose, 
         const file = e.target.files[0];
         const reader = new FileReader();
         reader.onloadend = () => {
-            setReceiptUrl(reader.result as string);
+            setReceiptFile({
+                name: file.name,
+                type: file.type,
+                url: reader.result as string,
+            });
         };
         reader.readAsDataURL(file);
+    } else {
+        setReceiptFile(null);
     }
   };
 
@@ -50,7 +56,7 @@ const AddGlobalExpenseModal: React.FC<AddGlobalExpenseModalProps> = ({ onClose, 
     }
     setError('');
     const { amount, ...rest } = formData;
-    onAddExpense({ ...rest, amount: parseFloat(amount), receipt_url: receiptUrl });
+    onAddExpense({ ...rest, amount: parseFloat(amount), receipt_url: receiptFile?.url });
   };
 
   return (
@@ -89,13 +95,20 @@ const AddGlobalExpenseModal: React.FC<AddGlobalExpenseModalProps> = ({ onClose, 
                 <label className="block text-sm font-medium text-gray-700">Receipt Upload</label>
                 <input 
                   type="file" 
-                  accept="image/*"
+                  accept="image/*,application/pdf,.csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                   onChange={handleFileChange}
                   className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100"
                 />
-                {receiptUrl && (
+                {receiptFile && (
                   <div className="mt-2">
-                    <img src={receiptUrl} alt="Receipt preview" className="h-24 w-auto rounded-md object-cover" />
+                    {receiptFile.type.startsWith('image/') ? (
+                      <img src={receiptFile.url} alt="Receipt preview" className="h-24 w-auto rounded-md object-cover" />
+                    ) : (
+                      <div className="flex items-center space-x-2 p-2 bg-slate-100 rounded-md text-sm text-slate-700 ring-1 ring-slate-200">
+                        <DocumentDuplicateIcon className="w-5 h-5 flex-shrink-0 text-slate-500" />
+                        <span className="truncate font-medium">{receiptFile.name}</span>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

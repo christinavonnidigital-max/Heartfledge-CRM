@@ -127,8 +127,8 @@ const NavItem: React.FC<NavItemProps> = ({ item, activeView, onClick }) => {
       className={[
         "group flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm transition-all",
         isActive
-          ? "bg-slate-900/95 text-white shadow-md ring-1 ring-orange-400/70"
-          : "text-slate-200 hover:bg-slate-800/80 hover:text-white",
+          ? "bg-[#273465] text-white font-semibold ring-1 ring-orange-400/70"
+          : "text-slate-200 hover:bg-[#273465] hover:text-white",
       ].join(" ")}
     >
       <span
@@ -136,7 +136,7 @@ const NavItem: React.FC<NavItemProps> = ({ item, activeView, onClick }) => {
           "inline-flex h-8 w-8 items-center justify-center rounded-lg border text-sm transition-colors",
           isActive
             ? "border-orange-300 bg-orange-500 text-white"
-            : "border-slate-700 bg-slate-950 text-slate-200 group-hover:border-slate-500",
+            : "border-slate-700 bg-transparent text-slate-200 group-hover:border-slate-500",
         ].join(" ")}
       >
         {item.icon}
@@ -157,16 +157,18 @@ const SidebarShell: React.FC<SidebarProps> = ({
   };
 
   return (
-    <div className="flex h-full w-72 flex-col bg-gradient-to-b from-[#050817] via-[#050817] to-[#020617] text-slate-100 shadow-2xl">
+    <div className="flex h-full w-64 flex-col bg-[#202A56] text-slate-100 shadow-2xl">
       {/* Brand */}
-      <div className="flex h-16 items-center gap-3 border-b border-slate-800 px-4">
-        <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-orange-500 text-white shadow-md">
-          <TruckIcon className="h-5 w-5" />
-        </div>
-        <div className="flex flex-col leading-tight">
-          <span className="text-sm font-semibold tracking-tight">Heartfledge</span>
-          <span className="text-[11px] text-slate-400">Logistics and CRM hub</span>
-        </div>
+      <div className="flex h-16 items-center justify-center border-b border-slate-800/60 px-4">
+        <img
+          src="/heartfledge-logo-transparent-white.png"
+          alt="Heartfledge Logistics"
+          className="h-10 object-contain"
+          onError={(e) => {
+            // simple fallback if the path is wrong
+            (e.currentTarget as HTMLImageElement).style.display = 'none';
+          }}
+        />
       </div>
 
       {/* Nav */}
@@ -223,7 +225,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         />
 
         <div
-          className={`absolute inset-y-0 left-0 w-72 transform transition-transform duration-200 ease-out ${
+          className={`absolute inset-y-0 left-0 w-64 transform transition-transform duration-200 ease-out ${
             isOpen ? "translate-x-0" : "-translate-x-full"
           }`}
         >
@@ -237,7 +239,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       {/* Desktop sidebar */}
-      <div className="hidden md:fixed md:inset-y-0 md:left-0 md:z-30 md:flex md:w-72">
+      <div className="hidden md:fixed md:inset-y-0 md:left-0 md:z-30 md:flex md:w-64">
         <SidebarShell
           activeView={activeView}
           setActiveView={setActiveView}

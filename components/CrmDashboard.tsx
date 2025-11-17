@@ -8,6 +8,7 @@ import OpportunityDetailsModal from './OpportunityDetailsModal'; // Import the n
 import { Lead, LeadScoringRule, Opportunity } from '../types';
 import AddLeadModal from './AddLeadModal';
 import AddLeadScoringRuleModal from './AddLeadScoringRuleModal';
+import ImportLeadsModal from './ImportLeadsModal';
 import { calculateLeadScore } from '../services/crmService';
 import { BriefcaseIcon, CurrencyDollarIcon, UsersIcon } from './icons/Icons';
 
@@ -33,6 +34,8 @@ const CrmDashboard: React.FC = () => {
     const [selectedOpportunity, setSelectedOpportunity] = useState<Opportunity | null>(null);
     const [isAddLeadModalOpen, setIsAddLeadModalOpen] = useState(false);
     const [isAddRuleModalOpen, setIsAddRuleModalOpen] = useState(false);
+    const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+
 
     // Recalculate lead scores whenever the rules change.
     useEffect(() => {
@@ -78,6 +81,18 @@ const CrmDashboard: React.FC = () => {
         setLeads(prev => [newLead, ...prev]);
         setIsAddLeadModalOpen(false);
     };
+    
+    const handleImportLeads = (importedLeads: Omit<Lead, 'id' | 'created_at' | 'updated_at' | 'lead_score'>[]) => {
+        const newLeads: Lead[] = importedLeads.map((leadData, index) => ({
+            ...leadData,
+            id: Date.now() + index,
+            lead_score: calculateLeadScore(leadData, rules),
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+        }));
+        setLeads(prev => [...newLeads, ...prev]);
+        setIsImportModalOpen(false);
+    };
 
     const handleAddRule = (newRuleData: Omit<LeadScoringRule, 'id' | 'created_at' | 'updated_at'>) => {
         const newRule: LeadScoringRule = {
@@ -112,7 +127,12 @@ const CrmDashboard: React.FC = () => {
             </div>
             <SalesPipeline opportunities={mockOpportunities} onOpportunityClick={handleOpportunityClick} />
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <LeadList leads={leads} onSelectLead={handleSelectLead} onAddLeadClick={() => setIsAddLeadModalOpen(true)} />
+                <LeadList 
+                  leads={leads} 
+                  onSelectLead={handleSelectLead} 
+                  onAddLeadClick={() => setIsAddLeadModalOpen(true)}
+                  onImportClick={() => setIsImportModalOpen(true)}
+                />
                 <LeadScoringRules rules={rules} onAddRuleClick={() => setIsAddRuleModalOpen(true)} />
             </div>
             {selectedLead && (
@@ -142,6 +162,12 @@ const CrmDashboard: React.FC = () => {
             <AddLeadScoringRuleModal
                 onClose={() => setIsAddRuleModalOpen(false)}
                 onAddRule={handleAddRule}
+            />
+        )}
+        {isImportModalOpen && (
+            <ImportLeadsModal
+                onClose={() => setIsImportModalOpen(false)}
+                onImport={handleImportLeads}
             />
         )}
     </>

@@ -67,20 +67,20 @@ const FleetDashboard: React.FC = () => {
       <div className="grid gap-6 lg:grid-cols-[minmax(0,320px)_minmax(0,1fr)]">
         {/* Left column - vehicle list */}
         <ShellCard className="flex flex-col p-4">
-          <div className="flex justify-between items-start">
-            <SectionHeader
-              title={`Vehicle fleet (${filteredVehicles.length})`}
-              subtitle="Tap a truck to see usage, maintenance and spend"
-            />
-            <button
-              className="p-2 rounded-full bg-orange-500 text-white hover:bg-orange-600 transition flex-shrink-0"
-              onClick={() => setIsAddVehicleModalOpen(true)}
-            >
-              <PlusIcon className="w-5 h-5" />
-            </button>
-          </div>
+          <SectionHeader
+            title={`Vehicle fleet (${filteredVehicles.length})`}
+            subtitle="Tap a truck to see its details"
+            actions={
+              <button
+                className="p-2 rounded-lg bg-orange-500 text-white hover:bg-orange-600 transition flex-shrink-0"
+                onClick={() => setIsAddVehicleModalOpen(true)}
+              >
+                <PlusIcon className="w-5 h-5" />
+              </button>
+            }
+          />
 
-          <div className="mt-1">
+          <div className="mt-2">
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <SearchIcon className="w-5 h-5 text-gray-400" />

@@ -2,13 +2,14 @@ import React, { useState } from "react";
 import Sidebar from "./Sidebar";
 import { MenuIcon } from "./icons/Icons";
 import AiAssistant from "./FleetAssistant";
-import { View } from "../App";
+import { AppSettings, View } from "../App";
 
 interface LayoutProps {
   children: React.ReactNode;
   activeView: View;
   setActiveView: (view: View) => void;
   contextData: any;
+  settings?: Partial<AppSettings>;
 }
 
 const viewTitles: Record<View, string> = {
@@ -49,6 +50,7 @@ const Layout: React.FC<LayoutProps> = ({
   activeView,
   setActiveView,
   contextData,
+  settings,
 }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -77,11 +79,11 @@ const Layout: React.FC<LayoutProps> = ({
         setIsOpen={setIsSidebarOpen}
       />
 
-      <div className="relative flex min-h-screen flex-col bg-[#F4F5FB] text-slate-900 md:pl-72">
+      <div className="relative flex min-h-screen flex-col bg-[#EEF1FA] text-slate-900 md:pl-64">
         {/* Top bar */}
         <header className="sticky top-0 z-20 border-b border-slate-200 bg-gradient-to-r from-white via-white to-indigo-50/60 backdrop-blur">
           <div className="flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-4">
               <button
                 className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white p-2 text-slate-700 shadow-sm hover:bg-slate-50 md:hidden"
                 onClick={() => setIsSidebarOpen(true)}
@@ -89,6 +91,13 @@ const Layout: React.FC<LayoutProps> = ({
               >
                 <MenuIcon className="h-5 w-5" />
               </button>
+
+              <img
+                src="/heartfledge-logo-transparent-navy.png"
+                alt="Heartfledge logo"
+                className="hidden h-7 w-auto object-contain md:block"
+                onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
+              />
 
               <div>
                 <h1 className="text-base font-semibold capitalize text-slate-900 sm:text-lg md:text-xl">
@@ -114,12 +123,14 @@ const Layout: React.FC<LayoutProps> = ({
         </header>
 
         {/* Main content */}
-        <main className="flex-1 overflow-y-auto px-4 py-4 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
+        <main className="flex-1 overflow-y-auto px-4 py-4 sm:px-6 sm:py-6 lg:px-8 lg:py-8 text-[0.96rem]">
           <div className="mx-auto max-w-7xl space-y-6">{children}</div>
         </main>
       </div>
 
-      <AiAssistant contextData={contextData} contextType={contextType} />
+      {settings?.enableAssistant !== false && (
+        <AiAssistant contextData={contextData} contextType={contextType} />
+      )}
     </div>
   );
 };

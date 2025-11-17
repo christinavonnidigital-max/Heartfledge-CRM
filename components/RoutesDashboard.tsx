@@ -76,20 +76,21 @@ const RoutesDashboard: React.FC = () => {
       <div className="grid gap-6 lg:grid-cols-[minmax(0,320px)_minmax(0,1fr)]">
         {/* Left column - route list */}
         <ShellCard className="flex flex-col p-4">
-          <div className="flex justify-between items-start">
-            <SectionHeader
-              title={`Company routes (${filteredRoutes.length})`}
-              subtitle="Saved lanes and typical conditions"
-            />
-            <button
-              className="p-2 rounded-full bg-orange-500 text-white hover:bg-orange-600 transition flex-shrink-0"
-              onClick={handleAddNewClick}
-            >
-              <PlusIcon className="w-5 h-5" />
-            </button>
-          </div>
+          <SectionHeader
+            title={`Company routes (${filteredRoutes.length})`}
+            subtitle="Saved lanes and typical conditions"
+            actions={
+              <button
+                className="p-2 rounded-lg bg-orange-500 text-white hover:bg-orange-600 transition flex-shrink-0"
+                onClick={handleAddNewClick}
+                aria-label="Add new route"
+              >
+                <PlusIcon className="w-5 h-5" />
+              </button>
+            }
+          />
 
-          <div className="mt-1 flex flex-col sm:flex-row gap-2">
+          <div className="mt-2 flex flex-col sm:flex-row gap-2">
                  <select
                     value={routeTypeFilter}
                     onChange={(e) => setRouteTypeFilter(e.target.value as RouteType | 'all')}

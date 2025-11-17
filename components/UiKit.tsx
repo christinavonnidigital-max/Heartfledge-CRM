@@ -20,19 +20,22 @@ export const SubtleCard: React.FC<DivProps> = ({ className = "", ...props }) => 
   />
 );
 
-export const SectionHeader: React.FC<{ title: string; subtitle?: string }> = ({
+export const SectionHeader: React.FC<{ title: string; subtitle?: string; actions?: React.ReactNode; }> = ({
   title,
   subtitle,
+  actions
 }) => (
-  <div className="mb-3 flex items-baseline justify-between gap-2">
-    <div>
+  <div className="flex items-start justify-between gap-4">
+    <div className="flex-1">
       <h2 className="text-sm font-semibold text-slate-900">{title}</h2>
       {subtitle && (
-        <p className="text-xs text-slate-500">{subtitle}</p>
+        <p className="mt-0.5 text-xs text-slate-500">{subtitle}</p>
       )}
     </div>
+    {actions && <div className="flex-shrink-0 flex items-center gap-2">{actions}</div>}
   </div>
 );
+
 
 export const StatusPill: React.FC<{
   label: string;

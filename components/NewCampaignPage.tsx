@@ -4,6 +4,7 @@ import { Campaign, CampaignStatus, CampaignType, EmailSequence } from '../types'
 import CampaignDetailsStep from './campaignBuilder/CampaignDetailsStep';
 import SequenceBuilderStep from './campaignBuilder/SequenceBuilderStep';
 import { View } from '../App';
+import { ShellCard, SectionHeader } from './UiKit';
 
 interface NewCampaignPageProps {
     setActiveView: (view: View) => void;
@@ -32,7 +33,6 @@ const NewCampaignPage: React.FC<NewCampaignPageProps> = ({ setActiveView }) => {
     }
 
     const handleNext = () => {
-        // Validation for the current step can go here
         if (currentStep < 4) {
             setCurrentStep(currentStep + 1);
         }
@@ -52,27 +52,27 @@ const NewCampaignPage: React.FC<NewCampaignPageProps> = ({ setActiveView }) => {
                 return <CampaignDetailsStep data={campaignData} updateData={updateCampaignData} />;
             case 2:
                 return <SequenceBuilderStep sequences={campaignData.sequences || []} updateSequences={updateSequences} />;
-            // case 3: return <SelectLeadsStep />;
-            // case 4: return <ReviewStep />;
             default:
-                return <div>Step {currentStep} not implemented yet.</div>;
+                return <div className="text-center text-slate-500 py-16">Step {currentStep} not implemented yet.</div>;
         }
     }
 
     return (
-        <div className="bg-white rounded-xl shadow-md flex flex-col h-full">
-            <div className="p-4 border-b border-gray-200">
-                {/* Stepper UI can go here */}
-                <h2 className="text-xl font-bold">Step {currentStep}: {['Campaign Details', 'Build Sequence', 'Select Leads', 'Review & Launch'][currentStep - 1]}</h2>
+        <ShellCard className="flex flex-col h-full">
+            <div className="p-4 border-b border-slate-100">
+                <SectionHeader
+                  title={`Step ${currentStep}: ${['Campaign Details', 'Build Sequence', 'Select Leads', 'Review & Launch'][currentStep - 1]}`}
+                  subtitle="Build a new sequence in a few steps"
+                />
             </div>
             <div className="flex-1 p-6 overflow-y-auto">
                 {renderStep()}
             </div>
-            <footer className="p-4 bg-gray-50 border-t border-gray-200 flex flex-col-reverse sm:flex-row sm:justify-between items-center gap-3">
+            <footer className="p-4 bg-slate-50/70 border-t border-slate-100 flex flex-col-reverse sm:flex-row sm:justify-between items-center gap-3">
                 <button
                     type="button"
                     onClick={handleBack}
-                    className="w-full sm:w-auto bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
+                    className="w-full sm:w-auto bg-white py-2 px-4 border border-slate-300 rounded-md shadow-sm text-sm font-medium text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
                 >
                     {currentStep === 1 ? 'Back to Campaigns' : 'Back'}
                 </button>
@@ -80,7 +80,7 @@ const NewCampaignPage: React.FC<NewCampaignPageProps> = ({ setActiveView }) => {
                     <button
                         type="button"
                         onClick={() => alert('Campaign saved as draft!')}
-                        className="flex-1 sm:flex-initial bg-gray-100 py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-800 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
+                        className="flex-1 sm:flex-initial bg-slate-100 py-2 px-4 border border-slate-300 rounded-md shadow-sm text-sm font-medium text-slate-800 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
                     >
                         Save as Draft
                     </button>
@@ -93,7 +93,7 @@ const NewCampaignPage: React.FC<NewCampaignPageProps> = ({ setActiveView }) => {
                     </button>
                 </div>
             </footer>
-        </div>
+        </ShellCard>
     );
 };
 
