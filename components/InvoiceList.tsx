@@ -1,67 +1,76 @@
+
 import React from 'react';
 import { Invoice, InvoiceStatus } from '../types';
 import { PlusIcon } from './icons/Icons';
+import { ShellCard, SectionHeader, StatusPill } from './UiKit';
 
 interface InvoiceListProps {
   invoices: Invoice[];
   onAddInvoiceClick: () => void;
 }
 
-const getStatusColor = (status: InvoiceStatus) => {
-  switch (status) {
-    case InvoiceStatus.PAID: return 'bg-green-100 text-green-800';
-    case InvoiceStatus.OVERDUE: return 'bg-red-100 text-red-800';
-    case InvoiceStatus.PARTIAL: return 'bg-yellow-100 text-yellow-800';
-    case InvoiceStatus.SENT: return 'bg-blue-100 text-blue-800';
-    case InvoiceStatus.DRAFT: return 'bg-gray-100 text-gray-800';
-    default: return 'bg-gray-100 text-gray-800';
-  }
-};
-
 const InvoiceList: React.FC<InvoiceListProps> = ({ invoices, onAddInvoiceClick }) => {
+
+  const getStatusTone = (status: InvoiceStatus): "success" | "warn" | "danger" | "info" | "neutral" => {
+    switch (status) {
+      case InvoiceStatus.PAID: return 'success';
+      case InvoiceStatus.OVERDUE: return 'warn';
+      case InvoiceStatus.PARTIAL: return 'warn';
+      case InvoiceStatus.SENT: return 'info';
+      case InvoiceStatus.DRAFT: return 'neutral';
+      case InvoiceStatus.CANCELLED: return 'danger';
+      case InvoiceStatus.REFUNDED: return 'neutral';
+      default: return 'neutral';
+    }
+  };
+
   return (
-    <div className="bg-white rounded-xl shadow-md">
-      <div className="p-4 border-b border-gray-200 flex justify-between items-center">
-        <h2 className="text-xl font-bold">Recent Invoices</h2>
+    <ShellCard className="flex flex-col">
+      <div className="flex items-start justify-between p-4 border-b border-slate-100">
+        <SectionHeader
+          title="Invoices"
+          subtitle="Money owed and money collected"
+        />
         <button 
-          className="p-2 rounded-full bg-orange-500 text-white hover:bg-orange-600 transition"
+          className="p-2 -mt-2 -mr-1 rounded-full bg-orange-500 text-white hover:bg-orange-600 transition flex-shrink-0"
           onClick={onAddInvoiceClick}
+          aria-label="Add new invoice"
         >
           <PlusIcon className="w-5 h-5"/>
         </button>
       </div>
       <div className="overflow-x-auto">
-        <table className="w-full text-sm text-left text-gray-500">
-          <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+        <table className="min-w-full text-left text-sm">
+          <thead className="text-xs uppercase tracking-wide text-slate-500">
             <tr>
-              <th scope="col" className="px-6 py-3">Invoice #</th>
-              <th scope="col" className="px-6 py-3">Customer ID</th>
-              <th scope="col" className="px-6 py-3">Due Date</th>
-              <th scope="col" className="px-6 py-3">Total</th>
-              <th scope="col" className="px-6 py-3">Status</th>
+              <th className="px-4 py-2 font-medium">Invoice #</th>
+              <th className="px-4 py-2 font-medium">Customer</th>
+              <th className="px-4 py-2 font-medium">Due</th>
+              <th className="px-4 py-2 font-medium text-right">Total</th>
+              <th className="px-4 py-2 font-medium text-center">Status</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="divide-y divide-slate-100">
             {invoices.map((invoice) => (
-              <tr key={invoice.id} className="bg-white border-b hover:bg-gray-50">
-                <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+              <tr key={invoice.id} className="hover:bg-slate-50">
+                <td className="px-4 py-3 font-medium text-slate-900 whitespace-nowrap">
                   {invoice.invoice_number}
                 </td>
-                <td className="px-6 py-4">{invoice.customer_id}</td>
-                <td className="px-6 py-4">{new Date(invoice.due_date + 'T00:00:00').toLocaleDateString()}</td>
-                {/* FIX: Resolved a TypeScript error ("Expected 0 arguments, but got 2") by using `Intl.NumberFormat` for currency formatting, which avoids ambiguity with some TypeScript compiler/linter configurations that incorrectly infer the method signature of `toLocaleString`. */}
-                <td className="px-6 py-4">{new Intl.NumberFormat(undefined, { style: 'currency', currency: invoice.currency }).format(invoice.total_amount)}</td>
-                <td className="px-6 py-4">
-                  <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(invoice.status)}`}>
-                    {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}
-                  </span>
+                <td className="px-4 py-3 text-slate-600">{invoice.customer_id}</td>
+                <td className="px-4 py-3 text-slate-600">{new Date(invoice.due_date + 'T00:00:00').toLocaleDateString()}</td>
+                <td className="px-4 py-3 text-slate-800 font-medium text-right">{new Intl.NumberFormat(undefined, { style: 'currency', currency: invoice.currency }).format(invoice.total_amount)}</td>
+                <td className="px-4 py-3 text-center">
+                  <StatusPill
+                    label={invoice.status.replace(/_/g, ' ')}
+                    tone={getStatusTone(invoice.status)}
+                  />
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-    </div>
+    </ShellCard>
   );
 };
 

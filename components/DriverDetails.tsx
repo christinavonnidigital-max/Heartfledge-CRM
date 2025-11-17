@@ -18,10 +18,12 @@ const DetailSection: React.FC<{ title: string; icon: React.ReactNode; children: 
     </div>
 );
 
-const DetailItem: React.FC<{ label: string; value?: string | number | null; children?: React.ReactNode }> = ({ label, value, children }) => (
+// FIX: Updated the 'value' prop to accept React.ReactNode for more flexible content,
+// removed the confusing 'children' prop, and updated call sites.
+const DetailItem: React.FC<{ label: string; value?: React.ReactNode }> = ({ label, value }) => (
     <div className="grid grid-cols-3 gap-2 py-1">
         <span className="text-gray-500 font-medium col-span-1">{label}</span>
-        <span className="text-gray-900 col-span-2 break-words">{value || children || 'N/A'}</span>
+        <span className="text-gray-900 col-span-2 break-words">{value || 'N/A'}</span>
     </div>
 );
 
@@ -61,18 +63,18 @@ const DriverDetails: React.FC<DriverDetailsProps> = ({ driver, assignments }) =>
             <DetailSection title="License & Compliance" icon={<ClipboardDocumentIcon className="w-5 h-5" />}>
                 <DetailItem label="License #" value={driver.license_number} />
                 <DetailItem label="License Type" value={driver.license_type} />
-                <DetailItem label="License Expiry">
+                <DetailItem label="License Expiry" value={
                     <span className={isLicenseExpired ? 'font-bold text-red-600' : ''}>
                         {new Date(driver.license_expiry_date + 'T00:00:00').toLocaleDateString()}
                     </span>
-                </DetailItem>
-                <DetailItem label="Medical Cert. Expiry">
-                     {driver.medical_certificate_expiry ? (
+                } />
+                <DetailItem label="Medical Cert. Expiry" value={
+                     driver.medical_certificate_expiry ? (
                         <span className={isMedicalExpired ? 'font-bold text-red-600' : ''}>
                             {new Date(driver.medical_certificate_expiry + 'T00:00:00').toLocaleDateString()}
                         </span>
-                     ) : 'N/A'}
-                </DetailItem>
+                     ) : 'N/A'
+                } />
             </DetailSection>
         </div>
 

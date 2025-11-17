@@ -4,6 +4,7 @@ import { Route } from '../types';
 import { mockWaypoints } from '../data/mockRoutesData';
 import { ClockIcon, MapPinIcon, RoadIcon, ExclamationTriangleIcon } from './icons/Icons';
 import RouteMap from './RouteMap';
+import { ShellCard } from './UiKit';
 
 interface RouteDetailsProps {
   route: Route;
@@ -24,7 +25,7 @@ const RouteDetails: React.FC<RouteDetailsProps> = ({ route }) => {
   const waypoints = mockWaypoints.filter((wp) => wp.route_id === route.id);
 
   return (
-    <div className="bg-white rounded-xl shadow-md p-6 overflow-y-auto">
+    <ShellCard className="p-6 overflow-y-auto">
       <div className="border-b border-gray-200 pb-4 mb-6">
         <h3 className="text-2xl font-bold leading-6 text-gray-900">{route.route_name}</h3>
         <p className="mt-1 text-md text-gray-500">{route.route_code}</p>
@@ -65,7 +66,7 @@ const RouteDetails: React.FC<RouteDetailsProps> = ({ route }) => {
           </div>
         </div>
       </div>
-    </div>
+    </ShellCard>
   );
 };
 

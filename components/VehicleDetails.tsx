@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { Vehicle, VehicleExpense, ExpenseType, Currency } from '../types';
 import { mockMaintenance } from '../data/mockData';
 import { CogIcon, CurrencyDollarIcon, GaugeIcon, PlusIcon, RoadIcon, WrenchIcon, FuelIcon, ShieldCheckIcon, ClipboardDocumentIcon, TicketIcon, DocumentDuplicateIcon } from './icons/Icons';
+import { ShellCard, SubtleCard } from "./UiKit";
 
 interface VehicleDetailsProps {
   vehicle: Vehicle;
@@ -10,24 +11,22 @@ interface VehicleDetailsProps {
 }
 
 const StatCard: React.FC<{ icon: React.ReactNode; label: string; value: string | number }> = ({ icon, label, value }) => (
-  <button 
-    className="flex flex-col justify-between rounded-2xl bg-white px-4 py-3 shadow-sm ring-1 ring-slate-100 text-left w-full hover:bg-slate-50 transition" 
+  <SubtleCard 
+    className="flex items-center gap-3 px-4 py-3 hover:bg-slate-100 transition cursor-pointer" 
     onClick={() => alert(`Viewing details for ${label}`)}
   >
-    <div className="flex items-center justify-between">
-      <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-orange-50 text-orange-500">
-        {icon}
-      </div>
+    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-orange-50 text-orange-500 flex-shrink-0">
+      {icon}
     </div>
-    <div className="mt-3">
+    <div>
       <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
         {label}
       </p>
-      <p className="mt-1 text-xl font-semibold text-slate-900">
+      <p className="mt-1 text-lg font-semibold text-slate-900">
         {value}
       </p>
     </div>
-  </button>
+  </SubtleCard>
 );
 
 
@@ -112,8 +111,8 @@ const VehicleDetails: React.FC<VehicleDetailsProps> = ({ vehicle, expenses, onAd
 
 
   return (
-    <div className="bg-white rounded-xl shadow-md p-6 overflow-y-auto">
-      <div className="border-b border-gray-200 pb-4 mb-6">
+    <ShellCard className="p-6 overflow-y-auto">
+      <div className="border-b border-slate-200 pb-4 mb-6">
         <h3 className="text-2xl font-bold leading-6 text-gray-900">{vehicle.make} {vehicle.model} ({vehicle.year})</h3>
         <p className="mt-1 text-md text-gray-500">{vehicle.registration_number}</p>
       </div>
@@ -125,21 +124,20 @@ const VehicleDetails: React.FC<VehicleDetailsProps> = ({ vehicle, expenses, onAd
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <h4 className="text-lg font-semibold mb-3 flex items-center"><CogIcon className="w-5 h-5 mr-2 text-gray-500"/>Maintenance</h4>
-          <div className="space-y-3">
+        <SubtleCard className="p-4">
+          <h4 className="text-sm font-semibold mb-3 flex items-center"><CogIcon className="w-5 h-5 mr-2 text-gray-500"/>Maintenance</h4>
+          <div className="space-y-2">
             {maintenanceHistory.length > 0 ? maintenanceHistory.map((item) => (
-              <div key={item.id} className="p-3 bg-gray-50 rounded-lg">
-                <p className="font-semibold">{item.description}</p>
-                {/* FIX: Resolved a TypeScript error ("Expected 0 arguments, but got 2") by using `Intl.NumberFormat` for currency formatting, which avoids ambiguity with some TypeScript compiler/linter configurations that incorrectly infer the method signature of `toLocaleString`. */}
-                <p className="text-sm text-gray-500">{new Date(item.service_date).toLocaleDateString()} - {new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD' }).format(item.cost)}</p>
+              <div key={item.id} className="p-3 bg-white rounded-lg ring-1 ring-slate-100">
+                <p className="font-semibold text-sm">{item.description}</p>
+                <p className="text-xs text-gray-500">{new Date(item.service_date).toLocaleDateString()} - {new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD' }).format(item.cost)}</p>
               </div>
             )) : <p className="text-sm text-gray-500 p-3">No maintenance records.</p>}
           </div>
-        </div>
-        <div>
+        </SubtleCard>
+        <SubtleCard className="p-4">
             <div className="flex justify-between items-center mb-3">
-                <h4 className="text-lg font-semibold flex items-center"><CurrencyDollarIcon className="w-5 h-5 mr-2 text-gray-500"/>Expenses</h4>
+                <h4 className="text-sm font-semibold flex items-center"><CurrencyDollarIcon className="w-5 h-5 mr-2 text-gray-500"/>Expenses</h4>
                 <button
                     onClick={onAddExpenseClick}
                     className="p-1.5 rounded-full bg-orange-500 text-white hover:bg-orange-600 transition"
@@ -178,12 +176,11 @@ const VehicleDetails: React.FC<VehicleDetailsProps> = ({ vehicle, expenses, onAd
                     </div>
                 )}
             </div>
-            <div className="mt-4 p-3 bg-gray-100 rounded-lg text-sm">
+            <div className="mt-4 p-3 bg-white ring-1 ring-slate-100 rounded-lg text-sm">
               <h5 className="font-semibold text-gray-700 mb-1">Total for Period</h5>
               {Object.keys(expenseTotalByCurrency).length > 0 ? (
                   Object.entries(expenseTotalByCurrency).map(([currency, total]) => (
                       <p key={currency} className="text-lg font-bold text-gray-900">
-                          {/* FIX: Resolved a TypeScript error where 'total' was inferred as 'unknown'. Explicitly casting to 'Number' ensures type safety for the formatter. */}
                           {new Intl.NumberFormat(undefined, { style: 'currency', currency: currency, minimumFractionDigits: 2 }).format(Number(total))}
                       </p>
                   ))
@@ -195,14 +192,13 @@ const VehicleDetails: React.FC<VehicleDetailsProps> = ({ vehicle, expenses, onAd
             {filteredExpenses.length > 0 ? filteredExpenses.map((item) => {
                 const ui = getExpenseTypeUI(item.expense_type);
                 return (
-                    <div key={item.id} className="p-3 bg-gray-50 rounded-lg flex items-start gap-4">
+                    <div key={item.id} className="p-3 bg-white rounded-lg flex items-start gap-4 ring-1 ring-slate-100">
                         <div className={`flex-shrink-0 p-2 rounded-full ${ui.bgColor} ${ui.color}`}>
                             {ui.icon}
                         </div>
                         <div className="flex-1">
                           <div className="flex justify-between items-center">
                               <p className="font-semibold capitalize">{item.expense_type.replace('_', ' ')}</p>
-                              {/* FIX: Resolved a TypeScript error where `item.amount` was inferred as `unknown`. Explicitly casting to `Number` ensures type safety for the formatter. */}
                               <p className="font-bold text-gray-800">{new Intl.NumberFormat(undefined, { style: 'currency', currency: item.currency, minimumFractionDigits: 2}).format(Number(item.amount))}</p>
                           </div>
                           <p className="text-sm text-gray-600">{item.description}</p>
@@ -212,9 +208,9 @@ const VehicleDetails: React.FC<VehicleDetailsProps> = ({ vehicle, expenses, onAd
                 )
             }) : <p className="text-sm text-gray-500 p-3 italic">No expense records for the selected period.</p>}
           </div>
-        </div>
+        </SubtleCard>
       </div>
-    </div>
+    </ShellCard>
   );
 };
 

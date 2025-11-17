@@ -16,7 +16,9 @@ interface DriversPageProps {
 
 const DriversPage: React.FC<DriversPageProps> = ({ data }) => {
   const [drivers, setDrivers] = useState<Driver[]>(data.drivers);
-  const [selectedDriver, setSelectedDriver] = useState<Driver | null>(drivers.length > 0 ? drivers[0] : null);
+  // FIX: Changed state type to accommodate the 'user' property and initialized to null.
+  // The useEffect hook now correctly handles the initial selection.
+  const [selectedDriver, setSelectedDriver] = useState<(Driver & { user?: User }) | null>(null);
   const [isAddDriverModalOpen, setIsAddDriverModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<EmploymentStatus | 'all'>('all');
@@ -100,7 +102,7 @@ const DriversPage: React.FC<DriversPageProps> = ({ data }) => {
                 <PlusIcon className="w-5 h-5"/>
               </button>
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row gap-2">
               <div className="relative flex-grow">
                 <input
                   type="text"

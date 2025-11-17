@@ -68,26 +68,26 @@ const NewCampaignPage: React.FC<NewCampaignPageProps> = ({ setActiveView }) => {
             <div className="flex-1 p-6 overflow-y-auto">
                 {renderStep()}
             </div>
-            <footer className="p-4 bg-gray-50 border-t border-gray-200 flex justify-between items-center">
+            <footer className="p-4 bg-gray-50 border-t border-gray-200 flex flex-col-reverse sm:flex-row sm:justify-between items-center gap-3">
                 <button
                     type="button"
                     onClick={handleBack}
-                    className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
+                    className="w-full sm:w-auto bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
                 >
                     {currentStep === 1 ? 'Back to Campaigns' : 'Back'}
                 </button>
-                <div className="space-x-3">
+                <div className="flex w-full sm:w-auto items-center gap-3">
                     <button
                         type="button"
                         onClick={() => alert('Campaign saved as draft!')}
-                        className="bg-gray-100 py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-800 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
+                        className="flex-1 sm:flex-initial bg-gray-100 py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-800 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
                     >
                         Save as Draft
                     </button>
                     <button
                         type="button"
                         onClick={handleNext}
-                        className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
+                        className="flex-1 sm:flex-initial inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
                     >
                         {currentStep === 4 ? 'Launch Campaign' : 'Next Step'}
                     </button>

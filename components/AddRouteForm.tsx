@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { Route, RouteType, RoadConditions } from '../types';
+import { ShellCard } from './UiKit';
 
 interface AddRouteFormProps {
   onCancel: () => void;
@@ -48,7 +49,7 @@ const AddRouteForm: React.FC<AddRouteFormProps> = ({ onCancel, onAddRoute }) => 
     };
 
     return (
-    <div className="bg-white rounded-xl shadow-md p-6 overflow-y-auto">
+    <ShellCard className="p-6 overflow-y-auto">
         <form onSubmit={handleSubmit}>
             <div className="border-b border-gray-200 pb-4 mb-6">
                  <h3 className="text-2xl font-bold leading-6 text-gray-900">Add New Company Route</h3>
@@ -96,7 +97,7 @@ const AddRouteForm: React.FC<AddRouteFormProps> = ({ onCancel, onAddRoute }) => 
                 <button type="submit" className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-orange-600 hover:bg-orange-700">Save Route</button>
             </footer>
         </form>
-    </div>
+    </ShellCard>
     );
 };
 

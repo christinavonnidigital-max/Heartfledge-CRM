@@ -4,7 +4,8 @@ import SalesPipeline from './SalesPipeline';
 import LeadList from './LeadList';
 import LeadScoringRules from './LeadScoringRules';
 import LeadDetailsModal from './LeadDetailsModal';
-import { Lead, LeadScoringRule } from '../types';
+import OpportunityDetailsModal from './OpportunityDetailsModal'; // Import the new modal
+import { Lead, LeadScoringRule, Opportunity } from '../types';
 import AddLeadModal from './AddLeadModal';
 import AddLeadScoringRuleModal from './AddLeadScoringRuleModal';
 import { calculateLeadScore } from '../services/crmService';
@@ -29,6 +30,7 @@ const CrmDashboard: React.FC = () => {
     const [leads, setLeads] = useState<Lead[]>(mockLeads);
     const [rules, setRules] = useState<LeadScoringRule[]>(mockLeadScoringRules);
     const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
+    const [selectedOpportunity, setSelectedOpportunity] = useState<Opportunity | null>(null);
     const [isAddLeadModalOpen, setIsAddLeadModalOpen] = useState(false);
     const [isAddRuleModalOpen, setIsAddRuleModalOpen] = useState(false);
 
@@ -55,9 +57,14 @@ const CrmDashboard: React.FC = () => {
     const handleSelectLead = (lead: Lead) => {
         setSelectedLead(lead);
     };
+    
+    const handleOpportunityClick = (opportunity: Opportunity) => {
+        setSelectedOpportunity(opportunity);
+    };
 
     const handleCloseModal = () => {
         setSelectedLead(null);
+        setSelectedOpportunity(null);
     };
 
     const handleAddLead = (newLeadData: Omit<Lead, 'id' | 'created_at' | 'updated_at' | 'lead_score'>) => {
@@ -103,7 +110,7 @@ const CrmDashboard: React.FC = () => {
                     icon={<UsersIcon className="w-5 h-5" />}
                 />
             </div>
-            <SalesPipeline opportunities={mockOpportunities} />
+            <SalesPipeline opportunities={mockOpportunities} onOpportunityClick={handleOpportunityClick} />
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <LeadList leads={leads} onSelectLead={handleSelectLead} onAddLeadClick={() => setIsAddLeadModalOpen(true)} />
                 <LeadScoringRules rules={rules} onAddRuleClick={() => setIsAddRuleModalOpen(true)} />
@@ -114,6 +121,14 @@ const CrmDashboard: React.FC = () => {
                     salesReps={mockSalesReps}
                     leadActivities={mockLeadActivities}
                     onClose={handleCloseModal} 
+                />
+            )}
+            {selectedOpportunity && (
+                <OpportunityDetailsModal
+                    opportunity={selectedOpportunity}
+                    leads={leads}
+                    salesReps={mockSalesReps}
+                    onClose={handleCloseModal}
                 />
             )}
         </div>

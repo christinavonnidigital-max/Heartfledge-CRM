@@ -2,10 +2,11 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { mockVehicles, mockExpenses } from '../data/mockData';
 import { Vehicle, VehicleStatus, VehicleExpense } from '../types';
 import VehicleDetails from './VehicleDetails';
-import { PlusIcon, SearchIcon, IllustrationTruckIcon, CheckCircleIcon, WrenchIcon, TrashIcon, ExclamationTriangleIcon } from './icons/Icons';
+import { PlusIcon, SearchIcon, IllustrationTruckIcon } from './icons/Icons';
 import EmptyState from './EmptyState';
 import AddExpenseModal from './AddExpenseModal';
 import AddVehicleModal from './AddVehicleModal';
+import { ShellCard, SectionHeader, StatusPill } from "./UiKit";
 
 const FleetDashboard: React.FC = () => {
   const [vehicles, setVehicles] = useState<Vehicle[]>(mockVehicles);
@@ -61,77 +62,49 @@ const FleetDashboard: React.FC = () => {
     setIsAddExpenseModalOpen(false);
   };
 
-
-  const getStatusPill = (status: VehicleStatus) => {
-    switch (status) {
-      case VehicleStatus.ACTIVE:
-        return <span className="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800 flex items-center gap-1"><CheckCircleIcon className="w-4 h-4"/> Active</span>;
-      case VehicleStatus.MAINTENANCE:
-        return <span className="px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800 flex items-center gap-1"><WrenchIcon className="w-4 h-4"/> Maintenance</span>;
-      case VehicleStatus.RETIRED:
-        return <span className="px-2 py-1 text-xs font-medium rounded-full bg-gray-200 text-gray-700 flex items-center gap-1"><TrashIcon className="w-4 h-4"/> Retired</span>;
-      case VehicleStatus.OUT_OF_SERVICE:
-        return <span className="px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800 flex items-center gap-1"><ExclamationTriangleIcon className="w-4 h-4"/> Out of Service</span>;
-      default:
-        // FIX: TypeScript infers `status` as `never` because all enum cases are handled.
-        // Casting to string allows the code to compile and handle any future enum values gracefully.
-        return <span className="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800 capitalize">{(status as string).replace('_', ' ')}</span>;
-    }
-  };
-
-  const getStatusBorder = (status: VehicleStatus) => {
-    switch (status) {
-      case VehicleStatus.ACTIVE:
-        return 'border-green-500';
-      case VehicleStatus.MAINTENANCE:
-        return 'border-yellow-500';
-      case VehicleStatus.RETIRED:
-        return 'border-gray-400';
-      case VehicleStatus.OUT_OF_SERVICE:
-        return 'border-red-500';
-      default:
-        return 'border-transparent';
-    }
-  };
-
   return (
     <>
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-1 bg-white rounded-xl shadow-md flex flex-col">
-          <div className="p-4 border-b border-gray-200">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold">Vehicle Fleet ({filteredVehicles.length})</h2>
-              <button 
-                  className="p-2 rounded-full bg-orange-500 text-white hover:bg-orange-600 transition"
-                  onClick={() => setIsAddVehicleModalOpen(true)}
-              >
-                <PlusIcon className="w-5 h-5"/>
-              </button>
-            </div>
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,320px)_minmax(0,1fr)]">
+        {/* Left column - vehicle list */}
+        <ShellCard className="flex flex-col p-4">
+          <div className="flex justify-between items-start">
+            <SectionHeader
+              title={`Vehicle fleet (${filteredVehicles.length})`}
+              subtitle="Tap a truck to see usage, maintenance and spend"
+            />
+            <button
+              className="p-2 rounded-full bg-orange-500 text-white hover:bg-orange-600 transition flex-shrink-0"
+              onClick={() => setIsAddVehicleModalOpen(true)}
+            >
+              <PlusIcon className="w-5 h-5" />
+            </button>
+          </div>
+
+          <div className="mt-1">
             <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <SearchIcon className="w-5 h-5 text-gray-400" />
+              </div>
               <input
                 type="text"
                 placeholder="Filter by reg. number or make..."
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 pl-9 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500"
               />
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <SearchIcon className="w-5 h-5 text-gray-400" />
-              </div>
             </div>
           </div>
-          <div className="overflow-y-auto">
+
+          <div className="mt-3 -mx-2 px-2 flex-1 space-y-1 overflow-y-auto">
             {filteredVehicles.length > 0 ? (
-              <ul className="divide-y divide-gray-200">
-                {filteredVehicles.map((vehicle) => (
-                  <li
+              filteredVehicles.map((vehicle) => {
+                 const isSelected = selectedVehicle?.id === vehicle.id;
+                return (
+                  <button
                     key={vehicle.id}
                     onClick={() => setSelectedVehicle(vehicle)}
-                    className={`py-4 pr-4 pl-3 cursor-pointer hover:bg-gray-50 transition border-l-4 ${
-                      selectedVehicle?.id === vehicle.id 
-                        ? 'bg-orange-50 border-orange-500' 
-                        : getStatusBorder(vehicle.status)
+                    className={`w-full text-left rounded-xl px-3 py-2.5 transition ${
+                      isSelected ? "bg-orange-50 border border-orange-200" : "hover:bg-slate-50"
                     }`}
                   >
                     <div className="flex justify-between items-center">
@@ -139,19 +112,29 @@ const FleetDashboard: React.FC = () => {
                         <p className="font-semibold text-gray-900">{vehicle.make} {vehicle.model}</p>
                         <p className="text-sm text-gray-500">{vehicle.registration_number}</p>
                       </div>
-                      {getStatusPill(vehicle.status)}
+                       <StatusPill
+                        label={vehicle.status.replace(/_/g, ' ')}
+                        tone={
+                          vehicle.status === VehicleStatus.ACTIVE ? 'success'
+                          : vehicle.status === VehicleStatus.MAINTENANCE ? 'warn'
+                          : vehicle.status === VehicleStatus.OUT_OF_SERVICE ? 'danger'
+                          : 'neutral'
+                        }
+                      />
                     </div>
-                  </li>
-                ))}
-              </ul>
+                  </button>
+                )
+              })
             ) : (
               <div className="p-8 text-center text-gray-500">
                   <p>No vehicles found{searchTerm ? ` for "${searchTerm}"` : ''}.</p>
               </div>
             )}
           </div>
-        </div>
-        <div className="lg:col-span-2 flex flex-col gap-6">
+        </ShellCard>
+
+        {/* Right column - details */}
+        <div className="flex flex-col">
           {selectedVehicle ? (
             <VehicleDetails 
                 vehicle={selectedVehicle}

@@ -6,6 +6,7 @@ import RouteDetails from './RouteDetails';
 import { PlusIcon, IllustrationMapIcon } from './icons/Icons';
 import EmptyState from './EmptyState';
 import AddRouteForm from './AddRouteForm';
+import { ShellCard, SectionHeader, StatusPill } from "./UiKit";
 
 const RoutesDashboard: React.FC = () => {
   const [routes, setRoutes] = useState<Route[]>(mockRoutes);
@@ -70,36 +71,29 @@ const RoutesDashboard: React.FC = () => {
     setSelectedRoute(route);
   }
 
-  const getRouteTypeColor = (type: RouteType) => {
-    switch (type) {
-      case RouteType.CROSS_BORDER:
-        return 'bg-yellow-100 text-yellow-800';
-      case RouteType.DOMESTIC:
-        return 'bg-green-100 text-green-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
-
   return (
     <>
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-1 bg-white rounded-xl shadow-md flex flex-col">
-          <div className="p-4 border-b border-gray-200">
-            <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-bold">Company Routes ({filteredRoutes.length})</h2>
-                <button 
-                className="p-2 rounded-full bg-orange-500 text-white hover:bg-orange-600 transition"
-                onClick={handleAddNewClick}
-                >
-                <PlusIcon className="w-5 h-5"/>
-                </button>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,320px)_minmax(0,1fr)]">
+        {/* Left column - route list */}
+        <ShellCard className="flex flex-col p-4">
+          <div className="flex justify-between items-start">
+            <SectionHeader
+              title={`Company routes (${filteredRoutes.length})`}
+              subtitle="Saved lanes and typical conditions"
+            />
+            <button
+              className="p-2 rounded-full bg-orange-500 text-white hover:bg-orange-600 transition flex-shrink-0"
+              onClick={handleAddNewClick}
+            >
+              <PlusIcon className="w-5 h-5" />
+            </button>
+          </div>
+
+          <div className="mt-1 flex flex-col sm:flex-row gap-2">
                  <select
                     value={routeTypeFilter}
                     onChange={(e) => setRouteTypeFilter(e.target.value as RouteType | 'all')}
-                    className="w-full rounded-md border border-gray-300 bg-white text-gray-900 pl-3 pr-10 py-2 text-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
+                    className="w-full rounded-xl border border-slate-200 bg-white text-gray-900 pl-3 pr-10 py-2 text-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
                 >
                     <option value="all">All Types</option>
                     {Object.values(RouteType).map(type => (
@@ -109,7 +103,7 @@ const RoutesDashboard: React.FC = () => {
                 <select
                     value={roadConditionFilter}
                     onChange={(e) => setRoadConditionFilter(e.target.value as RoadConditions | 'all')}
-                    className="w-full rounded-md border border-gray-300 bg-white text-gray-900 pl-3 pr-10 py-2 text-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
+                    className="w-full rounded-xl border border-slate-200 bg-white text-gray-900 pl-3 pr-10 py-2 text-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
                 >
                     <option value="all">All Conditions</option>
                      {Object.values(RoadConditions).map(condition => (
@@ -117,41 +111,42 @@ const RoutesDashboard: React.FC = () => {
                     ))}
                 </select>
             </div>
-          </div>
-          <div className="overflow-y-auto">
-            <ul className="divide-y divide-gray-200">
-              {filteredRoutes.map((route) => (
-                <li
-                  key={route.id}
-                  onClick={() => handleSelectRoute(route)}
-                  className={`p-4 cursor-pointer hover:bg-gray-50 transition ${
-                    selectedRoute?.id === route.id && !isAddingRoute ? 'bg-orange-50 border-l-4 border-orange-500' : 'border-l-4 border-transparent'
-                  }`}
-                >
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <p className="font-semibold text-gray-900">{route.route_name}</p>
-                      <p className="text-sm text-gray-500">{route.distance_km} km</p>
+          <div className="mt-3 -mx-2 px-2 flex-1 space-y-1 overflow-y-auto">
+              {filteredRoutes.map((route) => {
+                const isSelected = selectedRoute?.id === route.id && !isAddingRoute;
+                return (
+                  <button
+                    key={route.id}
+                    onClick={() => handleSelectRoute(route)}
+                    className={`w-full text-left rounded-xl px-3 py-2.5 transition ${
+                      isSelected ? "bg-orange-50 border border-orange-200" : "hover:bg-slate-50"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <div>
+                        <p className="text-sm font-medium text-slate-900">
+                          {route.origin_city} - {route.destination_city}
+                        </p>
+                        <p className="text-xs text-slate-500">{route.distance_km} km</p>
+                      </div>
+                      <StatusPill
+                        label={route.route_type === "cross_border" ? "Cross border" : "Domestic"}
+                        tone={route.route_type === "cross_border" ? "info" : "success"}
+                      />
                     </div>
-                    <span
-                      className={`px-2 py-1 text-xs font-medium rounded-full capitalize ${getRouteTypeColor(
-                        route.route_type
-                      )}`}
-                    >
-                      {route.route_type.replace('_', ' ')}
-                    </span>
-                  </div>
-                </li>
-              ))}
+                  </button>
+                )
+              })}
               {filteredRoutes.length === 0 && (
                 <div className="p-8 text-center text-gray-500">
                     <p>No routes match the selected filters.</p>
                 </div>
               )}
-            </ul>
           </div>
-        </div>
-        <div className="lg:col-span-2 flex flex-col gap-6">
+        </ShellCard>
+
+        {/* Right column - details */}
+        <div className="flex flex-col">
           {isAddingRoute ? (
              <AddRouteForm onAddRoute={handleAddRoute} onCancel={handleCancelAdd} />
           ) : selectedRoute ? (

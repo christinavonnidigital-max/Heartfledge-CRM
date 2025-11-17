@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { mockInvoices, mockAllExpenses } from '../data/mockFinancialsData';
 import InvoiceList from './InvoiceList';
@@ -6,6 +7,22 @@ import { Invoice, Expense, InvoiceStatus } from '../types';
 import { CurrencyDollarIcon } from './icons/Icons';
 import AddInvoiceModal from './AddInvoiceModal';
 import AddGlobalExpenseModal from './AddGlobalExpenseModal';
+
+const StatCard: React.FC<{ label: string; value: number; icon: React.ReactNode }> = ({ label, value, icon }) => (
+    <div className="flex flex-col justify-between rounded-2xl bg-white px-4 py-3 shadow-sm ring-1 ring-slate-100">
+        <div className="flex items-center justify-between">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-orange-50 text-orange-500">
+                {icon}
+            </div>
+        </div>
+        <div className="mt-3">
+            <p className="text-xs font-medium uppercase tracking-wide text-slate-500">{label}</p>
+            <p className="mt-1 text-xl font-semibold text-slate-900">
+                {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value)}
+            </p>
+        </div>
+    </div>
+);
 
 const FinancialsDashboard: React.FC = () => {
     const [invoices, setInvoices] = useState<Invoice[]>(mockInvoices);
@@ -48,45 +65,23 @@ const FinancialsDashboard: React.FC = () => {
         setIsExpenseModalOpen(false);
     };
 
-    const StatCard: React.FC<{ title: string, value: string, icon: React.ReactNode }> = ({ title, value, icon }) => (
-      <div
-        className="flex flex-col justify-between rounded-2xl bg-white px-4 py-3 shadow-sm ring-1 ring-slate-100"
-      >
-        <div className="flex items-center justify-between">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-orange-50 text-orange-500">
-            {icon}
-          </div>
-        </div>
-        <div className="mt-3">
-          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
-            {title}
-          </p>
-          <p className="mt-1 text-xl font-semibold text-slate-900">
-            {value}
-          </p>
-        </div>
-      </div>
-    );
-
-
     return (
         <>
             <div className="flex flex-col gap-6">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {/* FIX: Resolved a TypeScript error ("Expected 0 arguments, but got 2") by using `Intl.NumberFormat` for currency formatting, which avoids ambiguity with some TypeScript compiler/linter configurations that incorrectly infer the method signature of `toLocaleString`. */}
                     <StatCard 
-                        title="Total Revenue (Paid)" 
-                        value={new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD' }).format(totalRevenue)}
+                        label="Total Revenue (Paid)" 
+                        value={totalRevenue}
                         icon={<CurrencyDollarIcon className="w-5 h-5" />}
                     />
                     <StatCard 
-                        title="Total Expenses" 
-                        value={new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD' }).format(totalExpenses)}
+                        label="Total Expenses" 
+                        value={totalExpenses}
                         icon={<CurrencyDollarIcon className="w-5 h-5" />}
                     />
                     <StatCard 
-                        title="Net Profit" 
-                        value={new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD' }).format(netProfit)}
+                        label="Net Profit" 
+                        value={netProfit}
                         icon={<CurrencyDollarIcon className={`w-5 h-5 ${netProfit > 0 ? 'text-green-500' : 'text-red-500'}`} />}
                     />
                 </div>

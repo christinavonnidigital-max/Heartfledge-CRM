@@ -1,6 +1,9 @@
+
 import React from 'react';
 import { Expense } from '../types';
 import { PlusIcon, DocumentDuplicateIcon } from './icons/Icons';
+import { ShellCard, SectionHeader } from './UiKit';
+
 
 interface ExpenseListProps {
   expenses: Expense[];
@@ -9,51 +12,54 @@ interface ExpenseListProps {
 
 const ExpenseList: React.FC<ExpenseListProps> = ({ expenses, onAddExpenseClick }) => {
   return (
-    <div className="bg-white rounded-xl shadow-md">
-      <div className="p-4 border-b border-gray-200 flex justify-between items-center">
-        <h2 className="text-xl font-bold">Recent Expenses</h2>
-         <button 
-          className="p-2 rounded-full bg-orange-500 text-white hover:bg-orange-600 transition"
+    <ShellCard className="flex flex-col">
+      <div className="flex items-start justify-between p-4 border-b border-slate-100">
+        <SectionHeader
+          title="Recent Expenses"
+          subtitle="All operational costs"
+        />
+        <button 
+          className="p-2 -mt-2 -mr-1 rounded-full bg-orange-500 text-white hover:bg-orange-600 transition flex-shrink-0"
           onClick={onAddExpenseClick}
-         >
+          aria-label="Add new expense"
+        >
           <PlusIcon className="w-5 h-5"/>
         </button>
       </div>
       <div className="overflow-x-auto">
-        <table className="w-full text-sm text-left text-gray-500">
-          <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+        <table className="min-w-full text-left text-sm">
+          <thead className="text-xs uppercase tracking-wide text-slate-500">
             <tr>
-              <th scope="col" className="px-6 py-3">Category</th>
-              <th scope="col" className="px-6 py-3">Description</th>
-              <th scope="col" className="px-6 py-3">Date</th>
-              <th scope="col" className="px-6 py-3">Amount</th>
-              <th scope="col" className="px-6 py-3 text-center">Receipt</th>
+              <th scope="col" className="px-4 py-2 font-medium">Category</th>
+              <th scope="col" className="px-4 py-2 font-medium">Description</th>
+              <th scope="col" className="px-4 py-2 font-medium">Date</th>
+              <th scope="col" className="px-4 py-2 font-medium text-right">Amount</th>
+              <th scope="col" className="px-4 py-2 font-medium text-center">Receipt</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="divide-y divide-slate-100">
             {expenses.map((expense) => (
-              <tr key={expense.id} className="bg-white border-b hover:bg-gray-50">
-                <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                    {expense.expense_category.charAt(0).toUpperCase() + expense.expense_category.slice(1)}
+              <tr key={expense.id} className="hover:bg-slate-50">
+                <td className="px-4 py-3 font-medium text-slate-900 whitespace-nowrap capitalize">
+                    {expense.expense_category.replace(/_/g, ' ')}
                 </td>
-                <td className="px-6 py-4">{expense.description}</td>
-                <td className="px-6 py-4">{new Date(expense.expense_date + 'T00:00:00').toLocaleDateString()}</td>
-                {/* FIX: Resolved a TypeScript error ("Expected 0 arguments, but got 2") by using `Intl.NumberFormat` for currency formatting, which avoids ambiguity with some TypeScript compiler/linter configurations that incorrectly infer the method signature of `toLocaleString`. */}
-                <td className="px-6 py-4">{new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD' }).format(expense.amount_in_base_currency)}</td>
-                <td className="px-6 py-4 text-center">
+                <td className="px-4 py-3 text-slate-600">{expense.description}</td>
+                <td className="px-4 py-3 text-slate-600">{new Date(expense.expense_date + 'T00:00:00').toLocaleDateString()}</td>
+                <td className="px-4 py-3 text-slate-800 font-medium text-right">{new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD' }).format(expense.amount_in_base_currency)}</td>
+                <td className="px-4 py-3 text-center">
                   {expense.receipt_url ? (
                     <a href={expense.receipt_url} target="_blank" rel="noopener noreferrer" className="text-orange-500 hover:text-orange-700 inline-block">
                       <DocumentDuplicateIcon className="w-5 h-5" />
                     </a>
                   ) : (
-                    <span className="text-gray-400">-</span>
+                    <span className="text-slate-400">-</span>
                   )}
                 </td>
               </tr>
             ))}
              {expenses.length === 0 && (
                 <tr>
-                    <td colSpan={5} className="text-center py-8 text-gray-500">
+                    <td colSpan={5} className="text-center py-8 text-slate-500">
                        No expenses recorded.
                     </td>
                 </tr>
@@ -61,7 +67,7 @@ const ExpenseList: React.FC<ExpenseListProps> = ({ expenses, onAddExpenseClick }
           </tbody>
         </table>
       </div>
-    </div>
+    </ShellCard>
   );
 };
 
