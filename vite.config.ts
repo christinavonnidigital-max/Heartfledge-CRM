@@ -19,5 +19,21 @@ export default defineConfig(({ mode }) => {
           '@': path.resolve(__dirname, '.'),
         }
       }
+      ,
+      build: {
+        // Keep chunk sizes more ergonomic for initial download and allow explicit vendor splitting
+        chunkSizeWarningLimit: 800,
+        rollupOptions: {
+          output: {
+            manualChunks(id: string) {
+              if (id.includes('node_modules')) {
+                if (id.includes('react') || id.includes('scheduler') || id.includes('react-dom')) return 'react-vendor';
+                if (id.includes('recharts') || id.includes('victory') || id.includes('d3-')) return 'charts-vendor';
+                return 'vendor';
+              }
+            }
+          }
+        }
+      }
     };
 });
