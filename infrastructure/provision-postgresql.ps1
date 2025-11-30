@@ -72,6 +72,17 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
+# Define fallback SKUs with their corresponding tiers
+$SkuTierMap = @{
+    "Standard_B1ms" = "Burstable"
+    "Standard_B2s" = "Burstable"
+    "Standard_B2ms" = "Burstable"
+    "Standard_D2s_v3" = "GeneralPurpose"
+    "Standard_D4s_v3" = "GeneralPurpose"
+    "Standard_D2ds_v4" = "GeneralPurpose"
+    "Standard_D4ds_v4" = "GeneralPurpose"
+}
+
 # Define fallback SKUs in order of preference
 $FallbackSkus = @(
     "Standard_B1ms",
@@ -133,32 +144,56 @@ function Get-AllowedRegions {
     
     Write-Log "Retrieving allowed regions from Azure Policy..."
     
-    # Get policy assignments for the subscription
-    $policyAssignments = az policy assignment list --scope "/subscriptions/$SubscriptionId" --query "[?contains(policyDefinitionId, 'regionrestriction') || contains(name, 'regionrestriction')].{Name:name,PolicyId:policyDefinitionId}" -o json 2>&1
+    # Get all policy assignments for the subscription and filter for location-related policies
+    # This covers various naming patterns: regionrestriction, allowedLocations, location-restriction, etc.
+    $policyAssignments = az policy assignment list --scope "/subscriptions/$SubscriptionId" -o json 2>&1
     
     if ($LASTEXITCODE -ne 0) {
-        Write-Log "No region restriction policy found. All regions are allowed." "WARN"
+        Write-Log "Could not retrieve policy assignments. Proceeding without restriction." "WARN"
         return $null
     }
     
-    $policies = $policyAssignments | ConvertFrom-Json
+    $allPolicies = $policyAssignments | ConvertFrom-Json
     
-    if ($policies.Count -eq 0) {
+    # Filter for policies that might be location-related
+    $locationPatterns = @('region', 'location', 'allowed')
+    $policies = $allPolicies | Where-Object {
+        $name = $_.name.ToLower()
+        $policyId = $_.policyDefinitionId.ToLower()
+        $locationPatterns | ForEach-Object { $name -like "*$_*" -or $policyId -like "*$_*" } | Where-Object { $_ } | Select-Object -First 1
+    }
+    
+    if ($null -eq $policies -or @($policies).Count -eq 0) {
         Write-Log "No region restriction policy found. All regions are allowed." "WARN"
         return $null
     }
     
     foreach ($policy in $policies) {
-        Write-Log "Found policy: $($policy.Name)"
+        Write-Log "Found potential location policy: $($policy.name)"
         
-        # Try to get allowed locations from the policy assignment parameters
-        $assignmentDetails = az policy assignment show --name $policy.Name --scope "/subscriptions/$SubscriptionId" --query "parameters.listOfAllowedLocations.value" -o json 2>&1
+        # Try multiple common parameter paths for allowed locations
+        $parameterPaths = @(
+            "parameters.listOfAllowedLocations.value",
+            "parameters.allowedLocations.value",
+            "parameters.listOfAllowedLocations.allowedValues",
+            "parameters.allowedLocations.allowedValues"
+        )
         
-        if ($LASTEXITCODE -eq 0 -and $assignmentDetails -ne "null") {
-            $allowedLocations = $assignmentDetails | ConvertFrom-Json
-            if ($allowedLocations -and $allowedLocations.Count -gt 0) {
-                Write-Log "Allowed regions: $($allowedLocations -join ', ')" "SUCCESS"
-                return $allowedLocations
+        foreach ($paramPath in $parameterPaths) {
+            $assignmentDetails = az policy assignment show --name $policy.name --scope "/subscriptions/$SubscriptionId" --query $paramPath -o json 2>&1
+            
+            if ($LASTEXITCODE -eq 0 -and $assignmentDetails -ne "null" -and $assignmentDetails -ne "[]") {
+                try {
+                    $allowedLocations = $assignmentDetails | ConvertFrom-Json
+                    if ($allowedLocations -and @($allowedLocations).Count -gt 0) {
+                        Write-Log "Allowed regions: $($allowedLocations -join ', ')" "SUCCESS"
+                        return $allowedLocations
+                    }
+                }
+                catch {
+                    # Continue to next parameter path
+                    continue
+                }
             }
         }
     }
@@ -206,7 +241,15 @@ function New-PostgreSQLFlexibleServer {
         [string]$Version
     )
     
-    Write-Log "Attempting to create PostgreSQL Flexible Server with SKU: $SkuName"
+    # Determine the correct tier based on the SKU
+    $tier = if ($SkuTierMap.ContainsKey($SkuName)) {
+        $SkuTierMap[$SkuName]
+    } else {
+        # Default to Burstable for unknown SKUs starting with B, otherwise GeneralPurpose
+        if ($SkuName -like "Standard_B*") { "Burstable" } else { "GeneralPurpose" }
+    }
+    
+    Write-Log "Attempting to create PostgreSQL Flexible Server with SKU: $SkuName (Tier: $tier)"
     
     # Build the command with proper argument handling
     $result = az postgres flexible-server create `
@@ -216,7 +259,7 @@ function New-PostgreSQLFlexibleServer {
         --admin-user $Admin `
         --admin-password "$Password" `
         --sku-name $SkuName `
-        --tier "Burstable" `
+        --tier $tier `
         --storage-size $Storage `
         --version $Version `
         --output json 2>&1

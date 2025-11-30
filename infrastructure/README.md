@@ -56,10 +56,12 @@ Provisions an Azure PostgreSQL Flexible Server with:
 #### SKU Fallback Order
 
 If the requested SKU is unavailable, the script automatically tries:
-1. Standard_B1ms (Burstable)
-2. Standard_B2s (Burstable)
-3. Standard_D2s_v3 (General Purpose)
-4. Standard_D4s_v3 (General Purpose)
+1. Standard_B1ms (Burstable tier)
+2. Standard_B2s (Burstable tier)
+3. Standard_D2s_v3 (General Purpose tier)
+4. Standard_D4s_v3 (General Purpose tier)
+
+The script automatically determines the correct tier (Burstable or GeneralPurpose) based on the SKU name.
 
 #### Region Validation
 
